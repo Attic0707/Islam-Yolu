@@ -769,7 +769,7 @@ export default function Islam_App() {
           {/* Top bar with menu + title */}
           <View style={styles.topBar}>
             <TouchableOpacity onPress={() => toggleSidebar(false)}>
-              <Image source={require("./assets/icons/iconPack/sidebarMenu.png")} size={10} color="#fff" style={styles.sidebarMenuIcom}/>
+              <Image source={require("./assets/icons/iconPack/sidebarMenu.png")} size={10} style={styles.sidebarMenuIcom}/>
             </TouchableOpacity>
 
             <View style={styles.topBarTitleWrapper}>
@@ -1257,11 +1257,13 @@ export default function Islam_App() {
     topBar: {
       flexDirection: "row",
       alignItems: "center",
+      justifyContent: "center",
       marginBottom: 50,
+      marginTop: 35,
+      gap: 24,
     },
     topBarTitleWrapper: {
       flex: 1,
-      paddingTop: 50,
     },
     topIconRow: {
       flexDirection: "row",
@@ -1271,9 +1273,8 @@ export default function Islam_App() {
       gap: 24,
     },
     sidebarMenuIcom: {
-      width: 50,
-      height: 50,
-      tintColor: "#fff", 
+      width: 25,
+      height: 25,
     },
     subtitle: {
       fontSize: 16,
