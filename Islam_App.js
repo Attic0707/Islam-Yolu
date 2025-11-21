@@ -853,19 +853,20 @@ export default function Islam_App() {
           </View>
 
           <View style={styles.topIconRow}>
-            {/* Open Quran */}
-            <TouchableOpacity onPress={displayQuranPage} style={{ marginTop: 16 }}>
-              <Image source={require("./assets/icons/iconPack/quran.png")} size={25} color="#fff" style={{ alignSelf: "center" }} />
-            </TouchableOpacity>
-
             {/* Fetch Random Verse */}
             <TouchableOpacity onPress={fetchRandomVerse} style={{ marginTop: 16 }}>
-              <Image source={require("./assets/icons/iconPack/shuffle.png")} size={25} color="#fff" style={{ alignSelf: "center" }} />
+              <Image source={require("./assets/icons/iconPack/shuffle_3.png")} style={{ width: 60, height: 60, tintColor: "#fff" }} resizeMode="contain"/>
+            </TouchableOpacity>
+
+            {/* Open Quran */}
+            <TouchableOpacity onPress={displayQuranPage} style={{ marginTop: 16 }}>
+              <Image source={require("./assets/icons/iconPack/quran.png")} style={{ width: 60, height: 60, tintColor: "#fff" }} resizeMode="contain"/>
             </TouchableOpacity>
 
             {/* Share */}
+            {/* günün ayetini arkadaşlarınla paylaş */}
             <TouchableOpacity onPress={handleShare} style={{ marginTop: 16 }}>
-              <Image source={require("./assets/icons/iconPack/share.png")} size={25} color="#fff" style={{ alignSelf: "center" }} />
+              <Image source={require("./assets/icons/iconPack/share_4.png")} style={{ width: 60, height: 60, tintColor: "#fff" }} resizeMode="contain"/>
             </TouchableOpacity>
           </View>
         </View>
