@@ -17,6 +17,7 @@ import IftarSayaciPage from "./files/IftarSayaciPage";
 import AbdestPage from "./files/AbdestPage";
 import NamazPage from "./files/NamazPage";
 import NamazSureleriPage from "./files/NamazSureleriPage";
+import PrayerChecklistPage from "./files/PrayerChecklistPage";
 import YasinPage from "./files/YasinPage";
 import TesbihPage from "./files/TesbihPage";
 import KazaTakipPage from "./files/KazaTakipPage";
@@ -79,6 +80,7 @@ const MENU_ITEMS = [
   { key: "abdest", label: "Abdest" },
   { key: "namaz", label: "Namaz" },
   { key: "namaz_sureleri", label: "Namaz sureleri" },
+  { key: "namaz_takip", label: "Namaz takip" },
   { key: "yasin_suresi", label: "Yasin suresi" },
   { key: "tesbih", label: "Tesbih" },
   { key: "kaza_takip", label: "Kaza takip" },
@@ -456,9 +458,10 @@ export default function Islam_App() {
 
   async function handleShare() {
     try {
+      let message = `Günün ayeti: "${verseTurkish}". \nEzan vakitlerini ve Kur’an’dan günlük ayetleri gösteren bu uygulamayı Allah için paylaş!`;
       await Share.share({
-        message:
-          "Ezan vakitlerini ve Kur’an’dan günlük ayetleri gösteren bu uygulamayı Allah için paylaş!",
+        message: message
+          // "Ezan vakitlerini ve Kur’an’dan günlük ayetleri gösteren bu uygulamayı Allah için paylaş!",
         });
     } catch (error) {
       if (DEBUG) console.log("Share error:", error);
@@ -594,6 +597,10 @@ export default function Islam_App() {
         toggleSidebar(isLibOpened);
         break;
       case "namaz_sureleri":
+        setActivePage(key);
+        toggleSidebar(isLibOpened);
+        break;
+      case "namaz_takip":
         setActivePage(key);
         toggleSidebar(isLibOpened);
         break;
@@ -759,6 +766,7 @@ export default function Islam_App() {
       abdest: require("./assets/icons/iconPack/abdest.png"),
       namaz: require("./assets/icons/iconPack/namaz.png"),
       namaz_sureleri: require("./assets/icons/iconPack/namaz_sure.png"),
+      namaz_takip: require("./assets/icons/iconPack/namaz.png"),
       yasin_suresi: require("./assets/icons/iconPack/yasin.png"),
       tesbih: require("./assets/icons/iconPack/tesbih.png"),
       kaza_takip: require("./assets/icons/iconPack/kaza.png"),
@@ -809,7 +817,7 @@ export default function Islam_App() {
 
   return (
     <ImageBackground source={backgroundSource} style={styles.background} resizeMode="cover" >
-      <TextSizeButton activePage={activePage} visibleOnPages={[ "imsakiye", "dini_bayramlar", "takvim_arkasi", "abdest", "namaz", "namaz_sureleri", "yasin_suresi", "kirk_hadis", "veda_hutbesi", "otuziki_farz", "islam_ilmihali", "kuran_fihristi", "hadis_fihristi", "yedis_yuz_ucyuz_hadis", "secme_ayetler", "guzel_dualar", "guzel_sozler", "salavatlar", "peygamberler_tarihi", "efendimizin_hayati", "dort_halife", "sahabelerin_hayati", "hz_mevlana", "mesnevi", "ramazan_ve_oruc", "dini_sozluk", "isimler_sozlugu", "cevsan", "islami_soru_cevap", "namazin_turkcesi", "hac_umre_rehberi", "about", "help"]} top={50} right={16}/>
+      <TextSizeButton activePage={activePage} visibleOnPages={[ "imsakiye", "dini_bayramlar", "takvim_arkasi", "abdest", "namaz", "namaz_sureleri", "namaz_takip", "yasin_suresi", "kirk_hadis", "veda_hutbesi", "otuziki_farz", "islam_ilmihali", "kuran_fihristi", "hadis_fihristi", "yedis_yuz_ucyuz_hadis", "secme_ayetler", "guzel_dualar", "guzel_sozler", "salavatlar", "peygamberler_tarihi", "efendimizin_hayati", "dort_halife", "sahabelerin_hayati", "hz_mevlana", "mesnevi", "ramazan_ve_oruc", "dini_sozluk", "isimler_sozlugu", "cevsan", "islami_soru_cevap", "namazin_turkcesi", "hac_umre_rehberi", "about", "help"]} top={50} right={16}/>
       {/* =======================
           HOME PAGE
           ======================= */}
@@ -928,6 +936,13 @@ export default function Islam_App() {
           ======================= */}
       {activePage === "namaz_sureleri" && (
         <NamazSureleriPage onBack={() => setActivePage("home")} />
+      )}
+
+      {/* =======================
+          NAMAZ TAKİP PAGE
+          ======================= */}
+      {activePage === "namaz_takip" && (
+        <PrayerChecklistPage onBack={() => setActivePage("home")} />
       )}
 
       {/* =======================
@@ -1450,7 +1465,7 @@ export default function Islam_App() {
     },
 
     bottomCenter: {
-      position: "absolute",
+      position:  "absolute",
       left: "50%",
       transform: [{ translateX: -36 }],
       alignItems: "center",
