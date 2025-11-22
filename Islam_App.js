@@ -1478,7 +1478,6 @@ export default function Islam_App() {
     bottomIcon: {
       width: 48,
       height: 72,
-      tintColor: "#fff",
     },
 
     bottomBarCenterButton: {
