@@ -115,9 +115,9 @@ export default function DiniBayramlarPage({ onBack }) {
           <Text style={{ color: "#ffffff", fontSize: 18 }}>← </Text>
         </TouchableOpacity>
 
-        <Text style={styles.bayramTitle}>2025 Dini Günler & Bayramlar</Text>
+        <Text style={styles.bayramTitle}>2026 Dini Günler & Bayramlar</Text>
         <Text style={styles.bayramSubtitle}>
-          Ramazan ve Kurban Bayramı ile kandil geceleri, 2025 yılı için özetlenmiştir.
+          Ramazan ve Kurban Bayramı ile kandil geceleri, 2026 yılı için özetlenmiştir.
         </Text>
 
         <ScrollView style={{ marginTop: 10, width: "100%" }}>

@@ -23,6 +23,7 @@ import TesbihPage from "./files/TesbihPage";
 import KazaTakipPage from "./files/KazaTakipPage";
 import EzanDinlePage from "./files/EzanDinlePage";
 import NearbyMosquesPage from "./files/NearbyMosquesPage";
+import RuyetPage from "./files/RuyetPage";
 import HadisPage from "./files/HadisPage";
 import VedaPage from "./files/VedaPage";
 import OtuzIkiFarzPage from "./files/OtuzIkiFarzPage";
@@ -86,6 +87,7 @@ const MENU_ITEMS = [
   { key: "kaza_takip", label: "Kaza takip" },
   { key: "ezan_dinle", label: "Ezan dinle" },
   { key: "yakin_camiler", label: "Yakın camiler" },
+  { key: "ruyet", label: "Ruy'et Çalışmaları" },
   { key: "kirk_hadis", label: "40 hadis" },
   { key: "veda_hutbesi", label: "Veda hutbesi" },
   { key: "otuziki_farz", label: "32 farz" },
@@ -623,6 +625,10 @@ export default function Islam_App() {
         setActivePage(key);
         toggleSidebar(isLibOpened);
         break;
+      case "ruyet":
+        setActivePage(key);
+        toggleSidebar(isLibOpened);
+        break;
       case "kirk_hadis":
         setActivePage(key);
         toggleSidebar(isLibOpened);
@@ -771,6 +777,7 @@ export default function Islam_App() {
       kaza_takip: require("./assets/icons/iconPack/kaza.png"),
       ezan_dinle: require("./assets/icons/iconPack/ezan.png"),
       yakin_camiler: require("./assets/icons/iconPack/yakin.png"),
+      ruyet: require("./assets/icons/iconPack/kirk.png"),
       kirk_hadis: require("./assets/icons/iconPack/kirk.png"),
       veda_hutbesi: require("./assets/icons/iconPack/veda.png"),
       otuziki_farz: require("./assets/icons/iconPack/otuziki.png"),

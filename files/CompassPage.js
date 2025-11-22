@@ -113,18 +113,6 @@ export default function CompassPage({ onBack }) {
               {/* Inner dial background */}
               <View style={styles.innerDial} />
 
-              {/* Cardinal labels */}
-              <Text style={[styles.dirLabel, styles.dirN]}>N</Text>
-              <Text style={[styles.dirLabel, styles.dirE]}>E</Text>
-              <Text style={[styles.dirLabel, styles.dirS]}>S</Text>
-              <Text style={[styles.dirLabel, styles.dirW]}>W</Text>
-
-              {/* Small ticks (N-E-S-W diagonals) */}
-              <View style={[styles.tick, styles.tickNE]} />
-              <View style={[styles.tick, styles.tickSE]} />
-              <View style={[styles.tick, styles.tickSW]} />
-              <View style={[styles.tick, styles.tickNW]} />
-
               {/* Center dot */}
               <View style={styles.centerDot} />
             </View>
