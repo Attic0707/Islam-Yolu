@@ -830,7 +830,6 @@ export default function Islam_App() {
 
             <View style={styles.topBarTitleWrapper}>
               <Text style={styles.subtitle}> ALLAH'ın selamı ve bereketi üzerine olsun </Text>
-              <Text style={styles.subtitle}> Doğum günün kutlu olsun Eyüp Tugay Bahar </Text>
             </View>
           </View>
 
