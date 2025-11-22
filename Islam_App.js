@@ -175,9 +175,9 @@ export default function Islam_App() {
         setSettings(effectiveSettings);
         await requestNotificationPermissions();
         await scheduleDailyNotifications(effectiveSettings);
+        await fetchRandomVerse();
         const idx = Math.floor(Math.random() * BACKGROUNDS.length);
         setBackgroundSource(BACKGROUNDS[idx]);
-        // await fetchRandomVerse();
       } catch (e) {
         if (DEBUG) console.log("init error:", e);
       }
@@ -458,10 +458,9 @@ export default function Islam_App() {
 
   async function handleShare() {
     try {
-      let message = `Günün ayeti: "${verseTurkish}". \nEzan vakitlerini ve Kur’an’dan günlük ayetleri gösteren bu uygulamayı Allah için paylaş!`;
+      let message = `Günün ayeti: "${verseTurkish}". \nEzan vakitlerini ve Kur’an’dan günlük ayetleri gösteren bu uygulamaya bir göz at!`;
       await Share.share({
         message: message
-          // "Ezan vakitlerini ve Kur’an’dan günlük ayetleri gösteren bu uygulamayı Allah için paylaş!",
         });
     } catch (error) {
       if (DEBUG) console.log("Share error:", error);
@@ -831,6 +830,7 @@ export default function Islam_App() {
 
             <View style={styles.topBarTitleWrapper}>
               <Text style={styles.subtitle}> ALLAH'ın selamı ve bereketi üzerine olsun </Text>
+              <Text style={styles.subtitle}> Doğum günün kutlu olsun Eyüp Tugay Bahar </Text>
             </View>
           </View>
 
