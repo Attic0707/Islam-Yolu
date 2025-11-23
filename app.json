@@ -24,6 +24,9 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Konumunuzu, bulunduğunuz şehre göre namaz vakitlerini hesaplamak için kullanıyoruz.",
         "ITSAppUsesNonExemptEncryption": false
+      },
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-8919233762784771/1697907277"
       }
     },
     "android": {
@@ -38,7 +41,10 @@
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
         "NOTIFICATIONS"
-      ]
+      ],
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-8919233762784771/1697907277"
+      }
     },
     "web": {
       "favicon": "./assets/icons/iconPack/appIcon.png"
@@ -51,7 +57,8 @@
             "./assets/sounds/adhan.wav"
           ]
         }
-      ]
+      ],
+      "react-native-google-mobile-ads"
     ],
     "extra": {
       "eas": {

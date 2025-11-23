@@ -1,11 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
-import { StyleSheet, Text, View, Alert, ActivityIndicator, ImageBackground, ScrollView, Share, Image, TouchableOpacity, Animated, PanResponder} from "react-native";
+import { StyleSheet, Text, View, Alert, ActivityIndicator, ImageBackground, ScrollView, Share, Image, TouchableOpacity, Animated, PanResponder, Platform,} from "react-native";
 
 import * as Notifications from "expo-notifications";
 import * as Location from "expo-location";
 import TextSizeButton from "./files/TextSizeButton";
 import ScaledText from "./files/ScaledText";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// Google Mobile Ads
+import mobileAds, { BannerAd, BannerAdSize, TestIds, } from "react-native-google-mobile-ads";
 
 // pages
 import ImsakiyePage from "./files/ImsakiyePage";
@@ -71,6 +74,14 @@ Notifications.setNotificationHandler({
 
 // Sidebar config
 const SIDEBAR_WIDTH = 260;
+
+const bannerAdUnitId =
+  __DEV__
+    ? TestIds.BANNER
+    : Platform.select({
+        ios: "ca-app-pub-8919233762784771/1697907277",
+        android: "ca-app-pub-3940256099942544/6300978111", // sample test ID
+      });
 
 const MENU_ITEMS = [
   { key: "imsakiye", label: "İmsakiye" },
@@ -197,7 +208,6 @@ export default function Islam_App() {
     load();
   }, []);
 
-  /*
   useEffect(() => {
     mobileAds()
       .initialize()
@@ -205,7 +215,6 @@ export default function Islam_App() {
         if (DEBUG) console.log("Google Mobile Ads initialized");
       });
   }, []);
-  */
 
   async function requestNotificationPermissions() {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -218,7 +227,7 @@ export default function Islam_App() {
 
     if (finalStatus !== "granted") {
       Alert.alert(
-        "Bildirim izni gerekli", 
+        "Bildirim izni gerekli",
         "Ezan vakti bildirimleri gönderebilmemiz için bildirim iznine ihtiyaç var. Lütfen Ayarlar > Bildirimler bölümünden izin verin."
       );
     }
@@ -283,8 +292,7 @@ export default function Islam_App() {
         const minute = parseInt(mStr, 10);
 
         if (Number.isNaN(hour) || Number.isNaN(minute)) {
-          if (DEBUG)
-            console.warn(`Could not parse time for ${name}:`, raw);
+          if (DEBUG) console.warn(`Could not parse time for ${name}:`, raw);
           return null;
         }
 
@@ -297,10 +305,7 @@ export default function Islam_App() {
       }).filter(Boolean);
 
       if (parsed.length === 0) {
-        Alert.alert(
-          "Hata",
-          "Cevaptan hiç namaz vakti ayrıştırılamadı."
-        );
+        Alert.alert("Hata", "Cevaptan hiç namaz vakti ayrıştırılamadı.");
         setLoading(false);
         return null;
       }
@@ -349,7 +354,6 @@ export default function Islam_App() {
           content: {
             title: `${t.name} ezanı 🕋`,
             body: `${t.name} vakti geldi. Allah kabul etsin.`,
-            // later you could make this conditional on settings.soundEnabled if you use custom sounds
             sound: "adhan.wav",
           },
           trigger: triggerDate,
@@ -378,7 +382,7 @@ export default function Islam_App() {
       if (!json?.data?.hijri) return false;
 
       const hijriMonth = parseInt(json.data.hijri.month.number, 10); // 1–12
-      
+
       return hijriMonth === 9; // Ramadan = month 9
     } catch (e) {
       return false;
@@ -424,7 +428,8 @@ export default function Islam_App() {
       const verseNumber = parseInt(verseNumberStr, 10);
 
       if (!surahId || !verseNumber) {
-        if (DEBUG) console.warn("Could not parse surah/verse from", verseKey);
+        if (DEBUG)
+          console.warn("Could not parse surah/verse from", verseKey);
         setVerseLoading(false);
         return;
       }
@@ -464,8 +469,8 @@ export default function Islam_App() {
     try {
       let message = `Günün ayeti: "${verseTurkish}". \nEzan vakitlerini ve Kur’an’dan günlük ayetleri gösteren bu uygulamaya bir göz at!`;
       await Share.share({
-        message: message
-        });
+        message: message,
+      });
     } catch (error) {
       if (DEBUG) console.log("Share error:", error);
     }
@@ -760,7 +765,10 @@ export default function Islam_App() {
         toggleSidebar(isLibOpened);
         break;
       default:
-        Alert.alert("Yakında", "Allah'ın izniyle bu özellik yakında gelecek inşAllah.");
+        Alert.alert(
+          "Yakında",
+          "Allah'ın izniyle bu özellik yakında gelecek inşAllah."
+        );
         toggleSidebar(isLibOpened);
         break;
     }
@@ -824,7 +832,7 @@ export default function Islam_App() {
   }
 
   function shouldShowFloatingButton() {
-    const pagesToHide = [ "kurani_kerim",  ];
+    const pagesToHide = ["kurani_kerim"];
     return !pagesToHide.includes(activePage);
   }
 
@@ -843,7 +851,7 @@ export default function Islam_App() {
             </TouchableOpacity>
 
             <View style={styles.topBarTitleWrapper}>
-              <Text style={styles.subtitle}> ALLAH'ın selamı ve bereketi üzerine olsun </Text>
+              <Text style={styles.subtitle}> {" "} ALLAH'ın selamı ve bereketi üzerine olsun{" "} </Text>
             </View>
           </View>
 
@@ -927,14 +935,14 @@ export default function Islam_App() {
           İFTAR SAYACI PAGE
           ======================= */}
       {activePage === "iftarSayaci" && (
-        (<IftarSayaciPage onBack={() => setActivePage("home")} />)
+        <IftarSayaciPage onBack={() => setActivePage("home")} />
       )}
 
       {/* =======================
           İLHAM SAYACI PAGE
           ======================= */}
       {activePage === "ilham" && (
-        (<IlhamPage onBack={() => setActivePage("home")} />)
+        <IlhamPage onBack={() => setActivePage("home")} />
       )}
 
       {/* =======================
@@ -992,7 +1000,7 @@ export default function Islam_App() {
       {activePage === "ezan_dinle" && (
         <EzanDinlePage onBack={() => setActivePage("home")} />
       )}
-      
+
       {/* =======================
           YAKIN CAMİLER PAGE
           ======================= */}
@@ -1209,16 +1217,18 @@ export default function Islam_App() {
       {activePage === "hac_umre_rehberi" && (
         <HacUmreRehberPage onBack={() => setActivePage("home")} />
       )}
-      
+
       {/* =======================
           AYARLAR PAGE
           ======================= */}
       {activePage === "settings" && (
-        <SettingsPage onBack={() => setActivePage("home")}
+        <SettingsPage
+          onBack={() => setActivePage("home")}
           onSettingsChanged={(newSettings) => {
             setSettings(newSettings);
             scheduleDailyNotifications(newSettings);
-        }}/>
+          }}
+        />
       )}
 
       {/* =======================
@@ -1237,17 +1247,25 @@ export default function Islam_App() {
 
       {/* Sidebar */}
       <Animated.View
-        style={[ styles.sidebar, { transform: [{ translateX: sidebarAnim }] }, ]} >
+        style={[
+          styles.sidebar,
+          { transform: [{ translateX: sidebarAnim }] },
+        ]}
+      >
         <Text style={styles.sidebarTitle}>Menü</Text>
         <ScrollView>
-          {MENU_ITEMS.filter(item => {
+          {MENU_ITEMS.filter((item) => {
             if (item.key === "iftarSayaci" && !isRamadanNow) return false;
             return true;
-          }).map(item => (
-            <TouchableOpacity key={item.key} style={styles.sidebarItem} onPress={() => {
+          }).map((item) => (
+            <TouchableOpacity
+              key={item.key}
+              style={styles.sidebarItem}
+              onPress={() => {
                 setActivePage(item.key);
                 closeSidebar();
-              }}>
+              }}
+            >
               <Text style={styles.sidebarItemText}>{item.label}</Text>
             </TouchableOpacity>
           ))}
@@ -1260,28 +1278,41 @@ export default function Islam_App() {
       {isAppLibraryOpen && (
         <View style={styles.appLibraryOverlay}>
           {/* Backdrop behind the library content */}
-          <TouchableOpacity style={styles.appLibraryBackdrop} activeOpacity={1} onPress={toggleAppLibrary} />
+          <TouchableOpacity
+            style={styles.appLibraryBackdrop}
+            activeOpacity={1}
+            onPress={toggleAppLibrary}
+          />
 
           <View style={styles.appLibraryContent}>
             <Text style={styles.appLibraryTitle}> Uygulamalar </Text>
 
             <ScrollView contentContainerStyle={styles.appLibraryGrid}>
-            {MENU_ITEMS.filter(item => {
+              {MENU_ITEMS.filter((item) => {
                 if (item.key === "iftarSayaci" && !isRamadanNow) return false;
                 return true;
-            }).map((item) => (
-              <TouchableOpacity key={item.key} style={styles.appTile} onPress={() => { 
-                  handleMenuItemPress(item.key, true);
-                  setIsAppLibraryOpen(false); }} >
-                <View style={styles.appTileIcon}>
-                  <Image source={getIconForKey(item.key)} style={{ width: 30, height: 30 }} resizeMode="contain" />
-                </View>
+              }).map((item) => (
+                <TouchableOpacity
+                  key={item.key}
+                  style={styles.appTile}
+                  onPress={() => {
+                    handleMenuItemPress(item.key, true);
+                    setIsAppLibraryOpen(false);
+                  }}
+                >
+                  <View style={styles.appTileIcon}>
+                    <Image
+                      source={getIconForKey(item.key)}
+                      style={{ width: 30, height: 30 }}
+                      resizeMode="contain"
+                    />
+                  </View>
 
-                <ScaledText baseSize={14} style={styles.appTileLabel}>
-                  {item.label}
-                </ScaledText>
-              </TouchableOpacity>
-            ))}
+                  <ScaledText baseSize={14} style={styles.appTileLabel}>
+                    {item.label}
+                  </ScaledText>
+                </TouchableOpacity>
+              ))}
             </ScrollView>
           </View>
         </View>
@@ -1289,7 +1320,7 @@ export default function Islam_App() {
 
       {/* =======================
           BANNER AD
-          ======================= 
+          ======================= */}
       {activePage === "home" && (
         <View style={styles.adContainer}>
           <BannerAd
@@ -1304,7 +1335,6 @@ export default function Islam_App() {
           />
         </View>
       )}
-      */}
 
       {/* =======================
           BOTTOM BAR 
@@ -1312,277 +1342,316 @@ export default function Islam_App() {
       <View style={styles.bottomBar}>
         {/* LEFT: Shuffle + Prayer */}
         <View style={styles.bottomSide}>
-          <TouchableOpacity onPress={fetchRandomVerse} style={styles.bottomIconWrapper}>
-            <Image source={require("./assets/icons/iconPack/shuffle_3.png")} style={styles.bottomIcon} resizeMode="contain" />
+          <TouchableOpacity
+            onPress={fetchRandomVerse}
+            style={styles.bottomIconWrapper}
+          >
+            <Image
+              source={require("./assets/icons/iconPack/shuffle_3.png")}
+              style={styles.bottomIcon}
+              resizeMode="contain"
+            />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={displayPrayerChecklistPage} style={styles.bottomIconWrapper}>
-            <Image source={require("./assets/icons/iconPack/namazTR.png")} style={styles.bottomIcon} resizeMode="contain" />
+          <TouchableOpacity
+            onPress={displayPrayerChecklistPage}
+            style={styles.bottomIconWrapper}
+          >
+            <Image
+              source={require("./assets/icons/iconPack/namazTR.png")}
+              style={styles.bottomIcon}
+              resizeMode="contain"
+            />
           </TouchableOpacity>
         </View>
-
 
         {/* CENTER: App Library Button */}
         <View style={styles.bottomCenter}>
           {shouldShowFloatingButton() && (
-            <TouchableOpacity style={styles.bottomBarCenterButton} onPress={toggleAppLibrary} activeOpacity={0.8} >
-              <Image source={require("./assets/icons/iconPack/menuIcon.png")} style={styles.bottomBarCenterIcon} resizeMode="contain" />
+            <TouchableOpacity
+              style={styles.bottomBarCenterButton}
+              onPress={toggleAppLibrary}
+              activeOpacity={0.8}
+            >
+              <Image
+                source={require("./assets/icons/iconPack/menuIcon.png")}
+                style={styles.bottomBarCenterIcon}
+                resizeMode="contain"
+              />
             </TouchableOpacity>
           )}
         </View>
 
         {/* RIGHT: Quran + Share */}
         <View style={styles.bottomSide}>
-          <TouchableOpacity onPress={displayQuranPage} style={styles.bottomIconWrapper}>
-            <Image source={require("./assets/icons/iconPack/quran.png")} style={styles.bottomIcon} resizeMode="contain" />
+          <TouchableOpacity
+            onPress={displayQuranPage}
+            style={styles.bottomIconWrapper}
+          >
+            <Image
+              source={require("./assets/icons/iconPack/quran.png")}
+              style={styles.bottomIcon}
+              resizeMode="contain"
+            />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={handleShare} style={styles.bottomIconWrapper}>
-            <Image source={require("./assets/icons/iconPack/share_4.png")} style={styles.bottomIcon} resizeMode="contain" />
+          <TouchableOpacity
+            onPress={handleShare}
+            style={styles.bottomIconWrapper}
+          >
+            <Image
+              source={require("./assets/icons/iconPack/share_4.png")}
+              style={styles.bottomIcon}
+              resizeMode="contain"
+            />
           </TouchableOpacity>
         </View>
       </View>
 
       {/* Backdrop */}
       {isSidebarOpen && (
-        <TouchableOpacity style={styles.sidebarBackdrop} activeOpacity={1} onPress={toggleSidebar} />
+        <TouchableOpacity
+          style={styles.sidebarBackdrop}
+          activeOpacity={1}
+          onPress={toggleSidebar}
+        />
       )}
       <View style={styles.edgeSwipeZone} {...panResponder.panHandlers} />
     </ImageBackground>
   );
 }
 
-  const styles = StyleSheet.create({
-    background: {
-      flex: 1,
-    },
-    scroll: { 
-      padding: 16
-    },
-    overlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-      paddingHorizontal: 20,
-      paddingTop: 40,
-      paddingBottom: 20,
-      alignItems: "stretch",
-      justifyContent: "flex-start",
-    },
-    topBar: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 50,
-      marginTop: 35,
-      gap: 24,
-    },
-    topBarTitleWrapper: {
-      flex: 1,
-    },
-    topIconRow: {
-      flexDirection: "row",
-      justifyContent: "center",
-      alignItems: "center",
-      marginTop: 16,
-      gap: 24,
-    },
-    sidebarMenuIcom: {
-      width: 25,
-      height: 25,
-    },
-    subtitle: {
-      fontSize: 16,
-      textAlign: "left",
-      marginTop: 4,
-      color: "#d0d7e2",
-    },
-    verseContainer: {
-      marginTop: 24,
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      backgroundColor: "rgba(255, 255, 255, 0.06)",
-      borderRadius: 12,
-    },
-    verseLabel: {
-      fontSize: 16,
-      fontWeight: "600",
-      color: "#d0d7e2",
-      marginBottom: 8,
-      textAlign: "center",
-    },
-    verseArabic: {
-      fontSize: 20,
-      color: "#ffffff",
-      textAlign: "center",
-      marginBottom: 8,
-    },
-    verseTr: {
-      fontSize: 16,
-      color: "#d0d7e2",
-      textAlign: "center",
-    },
-    verseRef: {
-      fontSize: 14,
-      color: "#9aa4b8",
-      textAlign: "center",
-      marginTop: 4,
-    },
-    verseLoading: {
-      fontSize: 14,
-      color: "#9aa4b8",
-      textAlign: "center",
-    },
-    sidebar: {
-      position: "absolute",
-      top: 0,
-      bottom: 0,
-      left: 0,
-      width: 260,
-      backgroundColor: "rgba(10, 15, 25, 0.96)",
-      paddingTop: 50,
-      paddingHorizontal: 16,
-      zIndex: 20,
-    },
-    sidebarTitle: {
-      fontSize: 20,
-      fontWeight: "700",
-      color: "#ffffff",
-      marginBottom: 16,
-    },
-    sidebarItem: {
-      paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: "rgba(255,255,255,0.08)",
-    },
-    sidebarItemText: {
-      fontSize: 15,
-      color: "#f2f2f7",
-    },
-    sidebarBackdrop: {
-      position: "absolute",
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: "rgba(0,0,0,0.4)",
-      zIndex: 10,
-    },
-    edgeSwipeZone: {
-      position: "absolute",
-      left: 0,
-      top: 0,
-      bottom: 0,
-      width: 20,
-      zIndex: 15,
-    },
-    bottomBar: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: 0,
-      paddingVertical: 10,
-      backgroundColor: "rgba(0,0,0,0.4)",
-      position: "relative",
-    },
-    bottomSide: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-      flexDirection: "row",
-    },
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+  },
+  scroll: {
+    padding: 16,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 20,
+    alignItems: "stretch",
+    justifyContent: "flex-start",
+  },
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 50,
+    marginTop: 35,
+    gap: 24,
+  },
+  topBarTitleWrapper: {
+    flex: 1,
+  },
+  topIconRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 16,
+    gap: 24,
+  },
+  sidebarMenuIcom: {
+    width: 25,
+    height: 25,
+  },
+  subtitle: {
+    fontSize: 16,
+    textAlign: "left",
+    marginTop: 4,
+    color: "#d0d7e2",
+  },
+  verseContainer: {
+    marginTop: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    borderRadius: 12,
+  },
+  verseLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#d0d7e2",
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  verseArabic: {
+    fontSize: 20,
+    color: "#ffffff",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  verseTr: {
+    fontSize: 16,
+    color: "#d0d7e2",
+    textAlign: "center",
+  },
+  verseRef: {
+    fontSize: 14,
+    color: "#9aa4b8",
+    textAlign: "center",
+    marginTop: 4,
+  },
+  verseLoading: {
+    fontSize: 14,
+    color: "#9aa4b8",
+    textAlign: "center",
+  },
+  sidebar: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: 260,
+    backgroundColor: "rgba(10, 15, 25, 0.96)",
+    paddingTop: 50,
+    paddingHorizontal: 16,
+    zIndex: 20,
+  },
+  sidebarTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#ffffff",
+    marginBottom: 16,
+  },
+  sidebarItem: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.08)",
+  },
+  sidebarItemText: {
+    fontSize: 15,
+    color: "#f2f2f7",
+  },
+  sidebarBackdrop: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    zIndex: 10,
+  },
+  edgeSwipeZone: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 20,
+    zIndex: 15,
+  },
+  bottomBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 0,
+    paddingVertical: 10,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    position: "relative",
+  },
+  bottomSide: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+  },
 
-    bottomCenter: {
-      position:  "absolute",
-      left: "50%",
-      transform: [{ translateX: -36 }],
-      alignItems: "center",
-      justifyContent: "center",
-    },
+  bottomCenter: {
+    position: "absolute",
+    left: "50%",
+    transform: [{ translateX: -36 }],
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
-    bottomIconWrapper: {
-      marginHorizontal: 4,
-    },
+  bottomIconWrapper: {
+    marginHorizontal: 4,
+  },
 
-    bottomIcon: {
-      width: 48,
-      height: 72,
-    },
+  bottomIcon: {
+    width: 48,
+    height: 72,
+  },
 
-    bottomBarCenterButton: {
-      width: 72,
-      height: 72,
-      borderRadius: 36,
-      backgroundColor: "rgba(255,255,255,0.10)",
-      justifyContent: "center",
-      alignItems: "center",
-      borderWidth: 2,
-      borderColor: "rgba(255,255,255,0.35)",
-    },
+  bottomBarCenterButton: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: "rgba(255,255,255,0.1)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.35)",
+  },
 
-    bottomBarCenterIcon: {
-      width: 40,
-      height: 40,
-      tintColor: "#fff",
-    },
-    appLibraryOverlay: {
-      position: "absolute",
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-      zIndex: 40,
-    },
-    appLibraryBackdrop: {
-      position: "absolute",
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: "rgba(255, 255, 255, 0)",
-    },
-    appLibraryContent: {
-      flex: 1,
-      marginTop: 80,
-      marginBottom: 80,
-      marginHorizontal: 20,
-      borderRadius: 20,
-      backgroundColor: "rgba(10,15,25,0.96)",
-      padding: 16,
-    },
-    appLibraryTitle: {
-      fontSize: 20,
-      fontWeight: "700",
-      color: "#fff",
-      textAlign: "center",
-      marginBottom: 12,
-    },
-    appLibraryGrid: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      justifyContent: "space-between",
-    },
-    appTile: {
-      width: "30%",
-      marginBottom: 16,
-      alignItems: "center",
-    },
-    appTileIcon: {
-      width: 60,
-      height: 60,
-      borderRadius: 16,
-      backgroundColor: "rgba(255,255,255,0.08)",
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 6,
-    },
-    appTileLabel: {
-      fontSize: 12,
-      color: "#f2f2f7",
-      textAlign: "center",
-    },
-    adContainer: {
-      alignItems: "center",
-      justifyContent: "center",
-      paddingVertical: 8,
-      backgroundColor: "rgba(0,0,0,0.3)",
-    },
+  bottomBarCenterIcon: {
+    width: 40,
+    height: 40,
+    tintColor: "#fff",
+  },
+  appLibraryOverlay: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 40,
+  },
+  appLibraryBackdrop: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(255, 255, 255, 0)",
+  },
+  appLibraryContent: {
+    flex: 1,
+    marginTop: 80,
+    marginBottom: 80,
+    marginHorizontal: 20,
+    borderRadius: 20,
+    backgroundColor: "rgba(10,15,25,0.96)",
+    padding: 16,
+  },
+  appLibraryTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#fff",
+    textAlign: "center",
+    marginBottom: 12,
+  },
+  appLibraryGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  appTile: {
+    width: "30%",
+    marginBottom: 16,
+    alignItems: "center",
+  },
+  appTileIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 6,
+  },
+  appTileLabel: {
+    fontSize: 12,
+    color: "#f2f2f7",
+    textAlign: "center",
+  },
+  adContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 8,
+    backgroundColor: "rgba(0,0,0,0.3)",
+  },
 });
