@@ -80,7 +80,7 @@ const bannerAdUnitId =
     ? TestIds.BANNER
     : Platform.select({
         ios: "ca-app-pub-8919233762784771/1697907277",
-        android: "ca-app-pub-3940256099942544/6300978111", // sample test ID
+        android: "ca-app-pub-8919233762784771/9174081776",
       });
 
 const MENU_ITEMS = [

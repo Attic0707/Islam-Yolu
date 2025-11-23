@@ -4,7 +4,7 @@
     "slug": "islam-app",
     "scheme": "islam-app",
     "description": "Namaz vakitleri, kıble pusulası, ilmihal, hadis, tesbih ve daha fazlasını bir arada sunan İslami araç seti.",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/icons/iconPack/appIcon.png",
     "userInterfaceStyle": "light",
@@ -19,19 +19,16 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "4",
+      "buildNumber": "5",
       "bundleIdentifier": "com.anonymous.islam-app",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Konumunuzu, bulunduğunuz şehre göre namaz vakitlerini hesaplamak için kullanıyoruz.",
         "ITSAppUsesNonExemptEncryption": false
-      },
-      "config": {
-        "googleMobileAdsAppId": "ca-app-pub-8919233762784771/1697907277"
       }
     },
     "android": {
       "package": "com.tavanarasi.islamapp",
-      "versionCode": 4,
+      "versionCode": 5,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/iconPack/appIcon.png",
         "backgroundColor": "#ffffff"
@@ -41,10 +38,7 @@
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
         "NOTIFICATIONS"
-      ],
-      "config": {
-        "googleMobileAdsAppId": "ca-app-pub-8919233762784771/1697907277"
-      }
+      ]
     },
     "web": {
       "favicon": "./assets/icons/iconPack/appIcon.png"
@@ -58,7 +52,13 @@
           ]
         }
       ],
-      "react-native-google-mobile-ads"
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-8919233762784771~6883670790",
+          "iosAppId": "ca-app-pub-8919233762784771~5248594885"
+        }
+      ]
     ],
     "extra": {
       "eas": {
