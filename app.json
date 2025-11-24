@@ -4,7 +4,7 @@
     "slug": "islam-app",
     "scheme": "islam-app",
     "description": "Namaz vakitleri, kıble pusulası, ilmihal, hadis, tesbih ve daha fazlasını bir arada sunan İslami araç seti.",
-    "version": "1.0.9",
+    "version": "1.1.10",
     "orientation": "portrait",
     "icon": "./assets/icons/iconPack/appIcon.png",
     "userInterfaceStyle": "light",
@@ -19,7 +19,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "9",
+      "buildNumber": "10",
       "bundleIdentifier": "com.anonymous.islam-app",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Konumunuzu, bulunduğunuz şehre göre namaz vakitlerini hesaplamak için kullanıyoruz.",
@@ -28,7 +28,7 @@
     },
     "android": {
       "package": "com.tavanarasi.islamapp",
-      "versionCode": 9,
+      "versionCode": 10,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/iconPack/appIcon.png",
         "backgroundColor": "#ffffff"
