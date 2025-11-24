@@ -26,7 +26,7 @@ export default function DockBar({ activePage, onNavigate }) {
 
   return (
     <View style={styles.wrapper}>
-      <BlurView intensity={50} tint="dark" style={styles.dock}>
+      <BlurView intensity={50} tint="light" style={styles.dock}>
         {ITEMS.map((item) => (
           <TouchableOpacity key={item.key} onPress={() => { animateIcon(item.key); onNavigate(item.key); }} style={styles.iconWrapper} >
             <Animated.Image source={item.icon} style={[ styles.icon, activePage === item.key && styles.activeIcon, { transform: [{ scale: scaleValues[item.key] }] }, ]} resizeMode="contain" />

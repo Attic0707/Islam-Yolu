@@ -40,6 +40,7 @@ import HadisFihristiPage from "./files/HadisFihristiPage";
 import SecmeAyetlerPage from "./files/SecmeAyetlerPage";
 import GuzelDualarPage from "./files/GuzelDualarPage";
 import GuzelSozlerPage from "./files/GuzelSozlerPage";
+import GununAyetiPage from "./files/GununAyetiPage";
 import SalavatlarPage from "./files/SalavatlarPage";
 import PeygamberlerTarihiPage from "./files/PeygamberlerTarihiPage";
 import EfendimizinHayatiPage from "./files/EfendimizinHayatiPage";
@@ -130,6 +131,7 @@ const MENU_ITEMS = [
   { key: "secme_ayetler", label: "Seçme ayetler" },
   { key: "guzel_dualar", label: "Güzel dualar" },
   { key: "guzel_sozler", label: "Güzel sözler" },
+  { key: "gunun_ayeti", label: "Günün Ayeti" },
   { key: "salavatlar", label: "Salavatlar" },
   { key: "peygamberler_tarihi", label: "Peygamberler tarihi" },
   { key: "efendimizin_hayati", label: "Efendimizin hayatı" },
@@ -170,11 +172,7 @@ export default function Islam_App() {
   const [loading, setLoading] = useState(false);
   const [isScheduled, setIsScheduled] = useState(false);
   const [prayerTimes, setPrayerTimes] = useState([]);
-  const [verseLoading, setVerseLoading] = useState(false);
-  const [verseRef, setVerseRef] = useState("");
-  const [verseArabic, setVerseArabic] = useState("");
   const [verseTurkish, setVerseTurkish] = useState("");
-  const [verseNameTr, setVerseNameTr] = useState("");
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const sidebarAnim = useRef(new Animated.Value(-SIDEBAR_WIDTH)).current;
@@ -225,7 +223,7 @@ export default function Islam_App() {
         setSettings(effectiveSettings);
         await requestNotificationPermissions();
         await scheduleDailyNotifications(effectiveSettings);
-        await fetchRandomVerse();
+        // await fetchRandomVerse();
         const idx = Math.floor(Math.random() * BACKGROUNDS.length);
         setBackgroundSource(BACKGROUNDS[idx]);
       } catch (e) {
@@ -409,77 +407,6 @@ export default function Islam_App() {
     }
   }
 
-  async function fetchRandomVerse() {
-    try {
-      setVerseLoading(true);
-      const res = await fetch("https://api.quran.com/api/v4/verses/random");
-      const json = await res.json();
-      if (DEBUG)
-        console.log("random verse response:", JSON.stringify(json));
-
-      const verseInfo = json?.verse;
-      if (!verseInfo?.verse_key) {
-        if (DEBUG) console.warn("No verse_key in random verse response");
-        setVerseLoading(false);
-        return;
-      }
-
-      const verseKey = verseInfo.verse_key;
-      setVerseRef(verseKey);
-
-      const [surahIdStr, verseNumberStr] = verseKey.split(":");
-      const surahId = parseInt(surahIdStr, 10);
-      const verseNumber = parseInt(verseNumberStr, 10);
-
-      if (!surahId || !verseNumber) {
-        if (DEBUG)
-          console.warn("Could not parse surah/verse from", verseKey);
-        setVerseLoading(false);
-        return;
-      }
-
-      const trRes = await fetch(
-        `https://api.acikkuran.com/surah/${surahId}/verse/${verseNumber}`
-      );
-      const trJson = await trRes.json();
-      if (DEBUG)
-        console.log("acikkuran verse response:", JSON.stringify(trJson));
-
-      const verseData = trJson?.data;
-      if (!verseData) {
-        if (DEBUG) console.warn("No data in Açık Kuran response");
-        setVerseLoading(false);
-        return;
-      }
-
-      const arabicText = verseData.verse || "";
-      setVerseArabic(arabicText);
-
-      const turkishText = verseData.translation?.text || "";
-      setVerseTurkish(turkishText);
-
-      const verseNameTr = verseData.surah?.name || "";
-      setVerseNameTr(verseNameTr);
-
-      setVerseLoading(false);
-      handleMenuItemPress("home", true);
-    } catch (err) {
-      if (DEBUG) console.log("fetchRandomVerse error:", err);
-      setVerseLoading(false);
-    }
-  }
-
-  async function handleShare() {
-    try {
-      let message = `Günün ayeti: "${verseTurkish}". \nEzan vakitlerini ve Kur’an’dan günlük ayetleri gösteren bu uygulamaya bir göz at!`;
-      await Share.share({
-        message: message,
-      });
-    } catch (error) {
-      if (DEBUG) console.log("Share error:", error);
-    }
-  }
-
   function openSidebar() {
     Animated.timing(sidebarAnim, {
       toValue: 0,
@@ -608,6 +535,7 @@ export default function Islam_App() {
       case "secme_ayetler":
       case "guzel_dualar":
       case "guzel_sozler":
+      case "gunun_ayeti":
       case "salavatlar":
       case "peygamberler_tarihi":
       case "efendimizin_hayati":
@@ -672,6 +600,7 @@ export default function Islam_App() {
       secme_ayetler: require("./assets/icons/iconPack/selected.png"),
       guzel_dualar: require("./assets/icons/iconPack/dua.png"),
       guzel_sozler: require("./assets/icons/iconPack/sozler.png"),
+      gunun_ayeti: require("./assets/icons/iconPack/sozler.png"),
       salavatlar: require("./assets/icons/iconPack/salavat.png"),
       peygamberler_tarihi: require("./assets/icons/iconPack/prophet.png"),
       efendimizin_hayati: require("./assets/icons/iconPack/hayati.png"),
@@ -925,6 +854,13 @@ export default function Islam_App() {
       )}
 
       {/* =======================
+          GÜNÜN AYETİ PAGE
+          ======================= */}
+      {activePage === "gunun_ayeti" && (
+        <GununAyetiPage onBack={() => setActivePage("home")} />
+      )}
+
+      {/* =======================
           SALAVATLAR PAGE
           ======================= */}
       {activePage === "salavatlar" && (
@@ -1142,7 +1078,7 @@ export default function Islam_App() {
       {activePage === "home" && settings.adsEnabled && ADS_ENABLED && (
         <View style={styles.adContainer}>
           <BannerAd
-            unitId={bannerAdUnitId}
+            unitId={BANNER_AD_UNIT_ID}
             size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
             requestOptions={{
               requestNonPersonalizedAdsOnly: false,
@@ -1155,7 +1091,7 @@ export default function Islam_App() {
       )}
 
       {/* DockBar */}
-      <DockBar activePage={activePage} onNavigate={(key) => { setActivePage(key); }} />
+        <DockBar activePage={activePage} onNavigate={(key) => { setActivePage(key); }} />
 
       {/* Backdrop */}
       {isSidebarOpen && (
@@ -1174,13 +1110,9 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
   },
-  scroll: {
-    padding: 16,
-  },
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
-    // backgroundColor: "rgba(255, 0, 0, 1)",
     paddingRight: 15,
     paddingLeft: 20,
     paddingTop: 40,
@@ -1216,42 +1148,6 @@ const styles = StyleSheet.create({
     textAlign: "left",
     marginTop: 4,
     color: "#d0d7e2",
-  },
-  verseContainer: {
-    marginTop: 24,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
-    borderRadius: 12,
-  },
-  verseLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#d0d7e2",
-    marginBottom: 8,
-    textAlign: "center",
-  },
-  verseArabic: {
-    fontSize: 20,
-    color: "#ffffff",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  verseTr: {
-    fontSize: 16,
-    color: "#d0d7e2",
-    textAlign: "center",
-  },
-  verseRef: {
-    fontSize: 14,
-    color: "#9aa4b8",
-    textAlign: "center",
-    marginTop: 4,
-  },
-  verseLoading: {
-    fontSize: 14,
-    color: "#9aa4b8",
-    textAlign: "center",
   },
   sidebar: {
     position: "absolute",
