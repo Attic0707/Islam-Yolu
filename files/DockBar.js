@@ -1,21 +1,20 @@
 import React, { useRef } from "react";
-import {
-  View,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-  Animated,
-  Platform,
-} from "react-native";
+import { View, TouchableOpacity, Image, StyleSheet, Animated, Platform, } from "react-native";
 import { BlurView } from "expo-blur";
 
+const ITEMS = [
+  { key: "home", icon: require("../assets/icons/iconPack/home.png") },
+  { key: "namaz", icon: require("../assets/icons/iconPack/prayer.png") },
+  { key: "kurani_kerim", icon: require("../assets/icons/iconPack/quran_dock.png") },
+  { key: "settings", icon: require("../assets/icons/iconPack/settings_dock.png") },
+  { key: "kaza_takip", icon: require("../assets/icons/iconPack/qna.png") },
+];
+
 export default function DockBar({ activePage, onNavigate }) {
-  const scaleValues = {
-    home: useRef(new Animated.Value(1)).current,
-    namaz: useRef(new Animated.Value(1)).current,
-    quran: useRef(new Animated.Value(1)).current,
-    settings: useRef(new Animated.Value(1)).current,
-  };
+
+  const scaleValues = useRef(
+    Object.fromEntries(ITEMS.map((item) => [item.key, new Animated.Value(1)]))
+  ).current;
 
   function animateIcon(key) {
     const anim = scaleValues[key];
@@ -25,34 +24,12 @@ export default function DockBar({ activePage, onNavigate }) {
     ]).start();
   }
 
-  const ITEMS = [
-    { key: "home", icon: require("../assets/icons/iconPack/home.png") },
-    { key: "namaz", icon: require("../assets/icons/iconPack/prayer.png") },
-    { key: "quran", icon: require("../assets/icons/iconPack/quran_dock.png") },
-    { key: "settings", icon: require("../assets/icons/iconPack/settings_dock.png") },
-  ];
-
   return (
     <View style={styles.wrapper}>
       <BlurView intensity={50} tint="dark" style={styles.dock}>
         {ITEMS.map((item) => (
-          <TouchableOpacity
-            key={item.key}
-            onPress={() => {
-              animateIcon(item.key);
-              onNavigate(item.key);
-            }}
-            style={styles.iconWrapper}
-          >
-            <Animated.Image
-              source={item.icon}
-              style={[
-                styles.icon,
-                activePage === item.key && styles.activeIcon,
-                { transform: [{ scale: scaleValues[item.key] }] },
-              ]}
-              resizeMode="contain"
-            />
+          <TouchableOpacity key={item.key} onPress={() => { animateIcon(item.key); onNavigate(item.key); }} style={styles.iconWrapper} >
+            <Animated.Image source={item.icon} style={[ styles.icon, activePage === item.key && styles.activeIcon, { transform: [{ scale: scaleValues[item.key] }] }, ]} resizeMode="contain" />
           </TouchableOpacity>
         ))}
       </BlurView>

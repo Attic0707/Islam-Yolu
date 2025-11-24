@@ -1,24 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  TouchableOpacity,
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  ActivityIndicator,
-} from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, ScrollView, ActivityIndicator, Animated, } from "react-native";
 import * as Location from "expo-location";
 
 const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
-const PRAYER_LABELS = {
-  Fajr: "Sabah",
-  Dhuhr: "Öğle",
-  Asr: "İkindi",
-  Maghrib: "Akşam",
-  Isha: "Yatsı",
-};
+const PRAYER_LABELS = { Fajr: "Sabah", Dhuhr: "Öğle", Asr: "İkindi", Maghrib: "Akşam", Isha: "Yatsı",};
 
-export default function PrayerChecklistPage({ onBack }) {
+export default function NamazTakipPage({ onBack }) {
   const [loading, setLoading] = useState(true);
   const [coords, setCoords] = useState(null);
 
@@ -259,20 +246,7 @@ export default function PrayerChecklistPage({ onBack }) {
   const nextInfo = getNextPrayerInfo();
 
   return (
-    <View
-      style={[
-        styles.overlay,
-        { justifyContent: "flex-start", paddingTop: 60, paddingHorizontal: 20 },
-      ]}
-    >
-      {/* Back button */}
-      <TouchableOpacity
-        onPress={onBack}
-        style={{ alignSelf: "flex-start", marginBottom: 10 }}
-      >
-        <Text style={{ color: "#ffffff", fontSize: 18 }}>←</Text>
-      </TouchableOpacity>
-
+    <View >
       {/* HEADER */}
       <View style={styles.headerCard}>
         <View style={styles.headerTopRow}>
@@ -387,7 +361,7 @@ export default function PrayerChecklistPage({ onBack }) {
           <Text style={styles.errorText}>{errorMsg}</Text>
         ) : (
           <ScrollView
-            style={{ maxHeight: 260 }}
+            style={{ maxHeight: 400 }}
             contentContainerStyle={{ paddingVertical: 8 }}
           >
             {prayers.map((p) => {
@@ -399,12 +373,7 @@ export default function PrayerChecklistPage({ onBack }) {
                   onPress={() => togglePrayer(p.key)}
                   activeOpacity={0.7}
                 >
-                  <View
-                    style={[
-                      styles.checkboxOuter,
-                      checked && styles.checkboxOuterChecked,
-                    ]}
-                  >
+                  <View style={[ styles.checkboxOuter, checked && styles.checkboxOuterChecked, ]}  >
                     {checked && <View style={styles.checkboxInner} />}
                   </View>
 
@@ -425,9 +394,6 @@ export default function PrayerChecklistPage({ onBack }) {
 }
 
 // ---- STYLES ----
-
-import { Animated } from "react-native";
-
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
@@ -440,7 +406,8 @@ const styles = StyleSheet.create({
   },
 
   headerCard: {
-    backgroundColor: "rgba(0,0,0,0.65)",
+    // backgroundColor: "rgba(0,0,0,0.65)",
+    backgroundColor: "rgba(0, 0, 0, 0.39)",
     borderRadius: 14,
     padding: 14,
     marginBottom: 14,
@@ -511,7 +478,7 @@ const styles = StyleSheet.create({
 
   nextCard: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
+    backgroundColor: "rgba(0, 0, 0, 0.39)",
     borderRadius: 14,
     padding: 12,
     borderWidth: 1,
@@ -540,7 +507,7 @@ const styles = StyleSheet.create({
 
   progressCard: {
     width: 130,
-    backgroundColor: "rgba(0,0,0,0.6)",
+    backgroundColor: "rgba(0, 0, 0, 0.39)",
     borderRadius: 14,
     padding: 10,
     alignItems: "center",
@@ -579,10 +546,13 @@ const styles = StyleSheet.create({
   },
 
   checklistCard: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.7)",
+    flex: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.39)",
     borderRadius: 14,
-    padding: 12,
+    paddingTop: 12,
+    paddingLeft: 12,
+    paddingBottom: 0,
+    paddingRight: 12,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.08)",
   },

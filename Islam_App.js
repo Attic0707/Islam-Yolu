@@ -20,7 +20,7 @@ import IlhamPage from "./files/IlhamPage";
 import AbdestPage from "./files/AbdestPage";
 import NamazPage from "./files/NamazPage";
 import NamazSureleriPage from "./files/NamazSureleriPage";
-import PrayerChecklistPage from "./files/PrayerChecklistPage";
+import NamazTakipPage from "./files/NamazTakipPage";
 import YasinPage from "./files/YasinPage";
 import TesbihPage from "./files/TesbihPage";
 import KazaTakipPage from "./files/KazaTakipPage";
@@ -110,7 +110,6 @@ const MENU_ITEMS = [
   { key: "abdest", label: "Abdest" },
   { key: "namaz", label: "Namaz" },
   { key: "namaz_sureleri", label: "Namaz sureleri" },
-  { key: "namaz_takip", label: "Namaz takip" },
   { key: "yasin_suresi", label: "Yasin suresi" },
   { key: "tesbih", label: "Tesbih" },
   { key: "kaza_takip", label: "Kaza takip" },
@@ -407,22 +406,6 @@ export default function Islam_App() {
       return hijriMonth === 9; // Ramadan = month 9
     } catch (e) {
       return false;
-    }
-  }
-
-  async function displayQuranPage() {
-    try {
-      handleMenuItemPress("kurani_kerim", true);
-    } catch (error) {
-      if (DEBUG) console.log("Display error:", error);
-    }
-  }
-
-  async function displayPrayerChecklistPage() {
-    try {
-      handleMenuItemPress("namaz_takip", true);
-    } catch (error) {
-      if (DEBUG) console.log("Display error:", error);
     }
   }
 
@@ -731,50 +714,10 @@ export default function Islam_App() {
             <TouchableOpacity onPress={() => toggleSidebar(false)}>
               <Image source={require("./assets/icons/iconPack/sidebarMenu.png")} size={10} style={styles.sidebarMenuIcom}/>
             </TouchableOpacity>
-
-            <View style={styles.topBarTitleWrapper}>
-              <Text style={styles.subtitle}> {" "} ALLAH'ın selamı ve bereketi üzerine olsun{" "} </Text>
-            </View>
           </View>
 
-          {loading && (
-            <View style={{ marginTop: 16 }}>
-              <ActivityIndicator />
-              <Text style={{ marginTop: 8, color: "#d0d7e2" }}>
-                Bismillahirrahmanirrahim...
-              </Text>
-            </View>
-          )}
+          <NamazTakipPage onBack={() => setActivePage("home")} />
 
-          <View style={styles.verseContainer}>
-            <ScrollView style={styles.scroll}>
-              <Text style={styles.verseLabel}>Bugünün ayeti</Text>
-
-              {verseLoading ? (
-                <Text style={styles.verseLoading}>
-                  Bismillahirrahmanirrahim...
-                </Text>
-              ) : verseArabic ? (
-                <View>
-                  <Text style={styles.verseArabic}>{verseArabic}</Text>
-
-                  {verseTurkish ? (
-                    <Text style={styles.verseTr}>{verseTurkish}</Text>
-                  ) : null}
-
-                  <Text style={styles.verseLabel}>{verseNameTr} Suresi</Text>
-
-                  {verseRef ? (
-                    <Text style={styles.verseRef}>({verseRef})</Text>
-                  ) : null}
-                </View>
-              ) : (
-                <Text style={styles.verseLoading}>
-                  Ayet alınamadı. Aşağıdan tekrar deneyebilirsin.
-                </Text>
-              )}
-            </ScrollView>
-          </View>
         </View>
       )}
 
@@ -846,13 +789,6 @@ export default function Islam_App() {
           ======================= */}
       {activePage === "namaz_sureleri" && (
         <NamazSureleriPage onBack={() => setActivePage("home")} />
-      )}
-
-      {/* =======================
-          NAMAZ TAKİP PAGE
-          ======================= */}
-      {activePage === "namaz_takip" && (
-        <PrayerChecklistPage onBack={() => setActivePage("home")} />
       )}
 
       {/* =======================
@@ -1244,9 +1180,11 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
-    paddingHorizontal: 20,
+    // backgroundColor: "rgba(255, 0, 0, 1)",
+    paddingRight: 15,
+    paddingLeft: 20,
     paddingTop: 40,
-    paddingBottom: 20,
+    paddingBottom: 90,
     alignItems: "stretch",
     justifyContent: "flex-start",
   },
@@ -1254,8 +1192,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 50,
-    marginTop: 35,
+    marginBottom: 10,
+    marginTop: 10,
+    marginRight: 300,
     gap: 24,
   },
   topBarTitleWrapper: {
