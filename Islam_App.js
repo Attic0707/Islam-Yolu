@@ -8,8 +8,7 @@ import ScaledText from "./files/ScaledText";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useInterstitialAds } from "./files/useAds";
 
-// Google Mobile Ads
-import mobileAds, { BannerAd, BannerAdSize, InterstitialAd, AdEventType,  TestIds, } from "react-native-google-mobile-ads";
+import mobileAds, { BannerAd, BannerAdSize, TestIds, } from "react-native-google-mobile-ads";
 
 // pages
 import ImsakiyePage from "./files/ImsakiyePage";
@@ -78,8 +77,6 @@ const SIDEBAR_WIDTH = 260;
 
 // ad config
 const bannerAdUnitId = __DEV__ ? TestIds.BANNER : Platform.select({ ios: "ca-app-pub-8919233762784771/1697907277", android: "ca-app-pub-8919233762784771/9174081776", });
-const interstitialAdUnitId = __DEV__ ? TestIds.INTERSTITIAL : Platform.select({ ios: "ca-app-pub-8919233762784771/2566591222", android: "ca-app-pub-8919233762784771/7773354281", });
-const interstitial = InterstitialAd.createForAdRequest(interstitialAdUnitId, { requestNonPersonalizedAdsOnly: false, });
 
 const MENU_ITEMS = [
   { key: "imsakiye", label: "İmsakiye" },
@@ -168,6 +165,22 @@ export default function Islam_App() {
   const [isRamadanNow, setIsRamadanNow] = useState(false);
   const { maybeShowInterstitial } = useInterstitialAds(settings.adsEnabled);
 
+  useEffect(() => {
+    async function load() {
+      setIsRamadanNow(await isRamadan());
+    }
+    load();
+  }, []);
+
+  useEffect(() => {
+    mobileAds()
+      .initialize()
+      .then(() => {
+        if (DEBUG) console.log("Google Mobile Ads initialized");
+      })
+      .catch(() => {});
+  }, []);
+
   // init
   useEffect(() => {
     const init = async () => {
@@ -198,13 +211,6 @@ export default function Islam_App() {
     };
 
     init();
-  }, []);
-
-  useEffect(() => {
-    async function load() {
-      setIsRamadanNow(await isRamadan());
-    }
-    load();
   }, []);
 
   async function requestNotificationPermissions() {
@@ -565,197 +571,53 @@ export default function Islam_App() {
     }
     switch (key) {
       case "home":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "imsakiye":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "dini_bayramlar":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "takvim_arkasi":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "compass":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "zikirmatik":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "iftarSayaci":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "ilham":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "abdest":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "namaz":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "namaz_sureleri":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "namaz_takip":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "yasin_suresi":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "tesbih":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "kaza_takip":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "ezan_dinle":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "yakin_camiler":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "ruyet":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "kirk_hadis":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "veda_hutbesi":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "otuziki_farz":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "dini_yayin":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "kabeden_canli":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "esmaul_husna":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "islam_ilmihali":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "kuran_fihristi":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "kurani_kerim":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "hadis_fihristi":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "secme_ayetler":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "guzel_dualar":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "guzel_sozler":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "salavatlar":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "peygamberler_tarihi":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "efendimizin_hayati":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "dort_halife":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "sahabelerin_hayati":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "hz_mevlana":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "mesnevi":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "ramazan_ve_oruc":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "dini_sozluk":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "cevsan":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "islami_soru_cevap":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "cuma_hutbeleri":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "namazin_turkcesi":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "islam_quiz":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "hac_umre_rehberi":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "settings":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "about":
-        setActivePage(key);
-        toggleSidebar(isLibOpened);
-        break;
       case "help":
         setActivePage(key);
         toggleSidebar(isLibOpened);
