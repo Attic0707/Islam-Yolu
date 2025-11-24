@@ -7,8 +7,7 @@ import TextSizeButton from "./files/TextSizeButton";
 import ScaledText from "./files/ScaledText";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useInterstitialAds } from "./files/useAds";
-
-import mobileAds, { BannerAd, BannerAdSize, TestIds, } from "react-native-google-mobile-ads";
+import Constants from "expo-constants";
 
 // pages
 import ImsakiyePage from "./files/ImsakiyePage";
@@ -60,6 +59,7 @@ import HacUmreRehberPage from "./files/HacUmreRehberPage";
 import SettingsPage from "./files/SettingsPage";
 import AboutPage from "./files/AboutPage";
 import HelpPage from "./files/HelpPage";
+import DockBar from "./files/DockBar";
 
 const DEBUG = false;
 
@@ -75,8 +75,29 @@ Notifications.setNotificationHandler({
 // Sidebar config
 const SIDEBAR_WIDTH = 260;
 
-// ad config
-const bannerAdUnitId = __DEV__ ? TestIds.BANNER : Platform.select({ ios: "ca-app-pub-8919233762784771/1697907277", android: "ca-app-pub-8919233762784771/9174081776", });
+const IS_EXPO_GO = Constants.appOwnership === "expo";
+const ADS_ENABLED = !IS_EXPO_GO;
+
+let mobileAds = null;
+let BannerAd = null;
+let BannerAdSize = null;
+let InterstitialAd = null;
+let AdEventType = null;
+let TestIds = null;
+let INTERSTITIAL_AD_UNIT_ID = "";
+let BANNER_AD_UNIT_ID = "";
+
+if (ADS_ENABLED) {
+  const googleMobileAds = require("react-native-google-mobile-ads");
+  mobileAds = googleMobileAds.default;
+  BannerAd = googleMobileAds.BannerAd;
+  BannerAdSize = googleMobileAds.BannerAdSize;
+  InterstitialAd = googleMobileAds.InterstitialAd;
+  AdEventType = googleMobileAds.AdEventType;
+  TestIds = googleMobileAds.TestIds;
+
+  BANNER_AD_UNIT_ID = __DEV__ ? TestIds.BANNER : Platform.select({ ios: "ca-app-pub-8919233762784771/1697907277", android: "ca-app-pub-8919233762784771/9174081776",});
+}
 
 const MENU_ITEMS = [
   { key: "imsakiye", label: "İmsakiye" },
@@ -173,6 +194,9 @@ export default function Islam_App() {
   }, []);
 
   useEffect(() => {
+    if ( !ADS_ENABLED || !mobileAds || !InterstitialAd || !AdEventType || !INTERSTITIAL_AD_UNIT_ID ) {
+      return;
+    }
     mobileAds()
       .initialize()
       .then(() => {
@@ -1179,7 +1203,7 @@ export default function Islam_App() {
       {/* =======================
           BANNER AD
           ======================= */}
-      {activePage === "home" && settings.adsEnabled && (
+      {activePage === "home" && settings.adsEnabled && ADS_ENABLED && (
         <View style={styles.adContainer}>
           <BannerAd
             unitId={bannerAdUnitId}
