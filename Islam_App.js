@@ -408,13 +408,6 @@ export default function Islam_App() {
     }
   }
 
-  function handleSettingsChanged(data) {
-    if (data.backgroundChanged) {
-      const idx = Math.floor(Math.random() * BACKGROUNDS.length);
-      setBackgroundSource(BACKGROUNDS[idx]);
-    }
-  }
-
   function openSidebar() {
     Animated.timing(sidebarAnim, {
       toValue: 0,
@@ -593,7 +586,7 @@ export default function Islam_App() {
       kaza_takip: require("./assets/icons/iconPack/kaza.png"),
       ezan_dinle: require("./assets/icons/iconPack/ezan.png"),
       yakin_camiler: require("./assets/icons/iconPack/yakin.png"),
-      ruyet: require("./assets/icons/iconPack/kirk.png"),
+      ruyet: require("./assets/icons/iconPack/ruyet.png"),
       kirk_hadis: require("./assets/icons/iconPack/kirk.png"),
       veda_hutbesi: require("./assets/icons/iconPack/veda.png"),
       otuziki_farz: require("./assets/icons/iconPack/otuziki.png"),
@@ -631,11 +624,6 @@ export default function Islam_App() {
     };
 
     return map[key] ?? { name: "apps", size: 28 }; // fallback
-  }
-
-  function shouldShowFloatingButton() {
-    const pagesToHide = ["kurani_kerim"];
-    return !pagesToHide.includes(activePage);
   }
 
   return (
