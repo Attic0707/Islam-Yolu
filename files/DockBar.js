@@ -7,15 +7,18 @@ const ITEMS = [
   { key: "gunun_ayeti", icon: require("../assets/icons/iconPack/ayet.png") },
   { key: "appLauncher", icon: require("../assets/icons/iconPack/appLauncher.png") },
   { key: "kurani_kerim", icon: require("../assets/icons/iconPack/quran_dock.png") },
+  { key: "ilham", icon: require("../assets/icons/iconPack/inspiration.png") },
   { key: "settings", icon: require("../assets/icons/iconPack/settings_dock.png") },
-  { key: "kaza_takip", icon: require("../assets/icons/iconPack/qna.png") },
 ];
 
 export default function DockBar({ activePage, onNavigate }) {
 
-  const scaleValues = useRef(
-    Object.fromEntries(ITEMS.map((item) => [item.key, new Animated.Value(1)]))
-  ).current;
+  const scaleValues = useRef({}).current;
+  ITEMS.forEach((item) => {
+    if (!scaleValues[item.key]) {
+      scaleValues[item.key] = new Animated.Value(1);
+    }
+  });
 
   function animateIcon(key) {
     const anim = scaleValues[key];
@@ -47,7 +50,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   dock: {
-    width: 260,
+    width: 300,
     height: 70,
     borderRadius: 30,
     flexDirection: "row",

@@ -10,35 +10,14 @@ export default function AboutPage({ onBack }) {
         </TouchableOpacity>
 
         {/* Title */}
-        <ScaledText
-          baseSize={24}
-          style={{
-            color: "#fff",
-            fontWeight: "600",
-            textAlign: "center",
-            marginBottom: 12,
-          }} >
+        <ScaledText baseSize={24} style={{ color: "#fff", fontWeight: "600", textAlign: "center", marginBottom: 12, }} >
           Hakkında
         </ScaledText>
 
         <ScrollView style={{ width: "100%" }}>
           <View
-            style={{
-              backgroundColor: "rgba(0,0,0,0.4)",
-              padding: 16,
-              borderRadius: 12,
-              marginBottom: 30,
-            }}
-          >
-            <ScaledText
-              baseSize={16}
-              style={{
-                color: "#fff",
-                marginBottom: 12,
-                fontWeight: "500",
-                textAlign: "center",
-              }}
-            >
+            style={{ backgroundColor: "rgba(0,0,0,0.4)", padding: 16, borderRadius: 12, marginBottom: 30, }}  >
+            <ScaledText baseSize={16} style={{ color: "#fff", marginBottom: 12, fontWeight: "500", textAlign: "center", }} >
               İslam App — Tüm İslami Araçlar Bir Arada
             </ScaledText>
 
@@ -60,39 +39,19 @@ export default function AboutPage({ onBack }) {
             </ScaledText>
 
             {/* Contact Section */}
-            <ScaledText
-              baseSize={16}
-              style={{
-                color: "#fff",
-                marginTop: 18,
-                marginBottom: 8,
-                fontWeight: "500",
-              }}
-            >
+            <ScaledText baseSize={16} style={{ color: "#fff", marginTop: 18, marginBottom: 8, fontWeight: "500", }} >
               İletişim
             </ScaledText>
 
-            <TouchableOpacity
-              onPress={() => Linking.openURL("mailto:samet@yourdomain.com")}
-            >
-              <ScaledText
-                baseSize={14}
-                style={{ color: "#8ecbff", textDecorationLine: "underline" }}
-              >
-                E-posta: sametatiiik7@gmail.com
+            <TouchableOpacity onPress={() => Linking.openURL("mailto:sametatiik7@gmail.com")} >
+              <ScaledText baseSize={14} style={{ color: "#8ecbff", textDecorationLine: "underline" }}  >
+                E-posta: sametatiik7@gmail.com
               </ScaledText>
             </TouchableOpacity>
 
             {/* Version info */}
-            <ScaledText
-              baseSize={12}
-              style={{
-                color: "#aaa",
-                marginTop: 25,
-                textAlign: "center",
-              }}
-            >
-              Sürüm: 1.0.0  
+            <ScaledText baseSize={12} style={{ color: "#aaa", marginTop: 25, textAlign: "center", }} >
+              Sürüm: 1.0.12  
               {"\n"}© 2025 - Tüm hakları saklıdır.
             </ScaledText>
           </View>
