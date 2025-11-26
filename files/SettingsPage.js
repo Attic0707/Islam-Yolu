@@ -1,30 +1,17 @@
 import React, { useEffect, useState } from "react";
-import {
-  TouchableOpacity,
-  View,
-  Text,
-  StyleSheet,
-  Alert,
-  Switch,
-  Linking,
-  Platform,
-  Share,
-} from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, Alert, Switch, Linking, Platform, Share, } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as StoreReview from "expo-store-review";
+// import * as StoreReview from "expo-store-review";
 
-// TODO: gerçek linkleriyle değiştir
-const APP_STORE_URL =
-  "https://apps.apple.com/app/idYOUR_IOS_APP_ID_HERE?action=write-review";
-const PLAY_STORE_URL =
-  "https://play.google.com/store/apps/details?id=YOUR_ANDROID_PACKAGE_NAME";
+const APP_STORE_URL = "https://apps.apple.com/app/idYOUR_IOS_APP_ID_HERE?action=write-review";
+const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=YOUR_ANDROID_PACKAGE_NAME";
 
 export default function SettingsPage({ onBack, onSettingsChanged }) {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
-  const [darkTheme, setDarkTheme] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [backgroundChanged, setBackgroundChange] = useState(false);
+  const [darkTheme, setDarkTheme] = useState(true);
   const [adsEnabled, setAdsEnabled] = useState(true);
   const [cooldown, setCooldown] = useState(false);
 
@@ -36,9 +23,9 @@ export default function SettingsPage({ onBack, onSettingsChanged }) {
           const parsed = JSON.parse(s);
           setSoundEnabled(parsed.soundEnabled ?? true);
           setVibrationEnabled(parsed.vibrationEnabled ?? true);
-          setDarkTheme(parsed.darkTheme ?? true);
           setNotificationsEnabled(parsed.notificationsEnabled ?? true);
           setBackgroundChange(parsed.backgroundChanged ?? false);
+          setDarkTheme(parsed.darkTheme ?? true);
           setAdsEnabled(parsed.adsEnabled ?? true);
         }
       } catch (e) {
@@ -123,11 +110,6 @@ export default function SettingsPage({ onBack, onSettingsChanged }) {
     }
   }
 
-  function goPremium() {
-    console.log("GO PREMIUM");
-    Alert.alert("Yakında", "İslam Yolu PRO çok yakında inşallah.");
-  }
-
   function updateTheApp() {
     console.log("UPDATE");
     Alert.alert("Güncel", "Uygulama için yeni bir güncelleme bulunamadı.");
@@ -196,16 +178,6 @@ export default function SettingsPage({ onBack, onSettingsChanged }) {
           </Text>
         </TouchableOpacity>
       </View>
-
-      {/* 
-      <View style={styles.settingRow}>
-        <TouchableOpacity onPress={goPremium} disabled={cooldown} style={styles.button}>
-          <Text style={[styles.settingLabel, cooldown && { opacity: 0.5 }]}>
-            İslam Yolu PRO'ya geç
-          </Text>
-        </TouchableOpacity>
-      </View>
-      */}
 
       <View style={styles.settingRow}>
         <TouchableOpacity onPress={updateTheApp} disabled={cooldown}>
