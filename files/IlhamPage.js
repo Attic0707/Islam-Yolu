@@ -1,7 +1,14 @@
 import React, { useState, useMemo } from "react";
-import { TouchableOpacity, View, Text, StyleSheet, ScrollView, Modal, Share, } from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, ScrollView, Modal, Share, ImageBackground, } from "react-native";
 import ScaledText from "./ScaledText";
 
+const STORY_PICS = [
+  require("../assets/images/ilham_pics/ilham1.jpg"),
+  require("../assets/images/ilham_pics/ilham2.jpg"),
+  require("../assets/images/ilham_pics/ilham3.jpg"),
+  require("../assets/images/ilham_pics/ilham4.jpg"),
+  require("../assets/images/ilham_pics/ilham5.jpg"),
+];
 const DEBUG = false;
 
 const STORY_ITEMS = [
@@ -666,6 +673,7 @@ export default function IlhamPage({ onBack }) {
   const [storyModalVisible, setStoryModalVisible] = useState(false);
   const [activeStoryIndex, setActiveStoryIndex] = useState(0);
   const [likedStories, setLikedStories] = useState({}); // {id: true/false}
+  const [backgroundSource, setBackgroundSource] = useState();
 
   // Feed item modal state
   const [selectedItem, setSelectedItem] = useState(null);
@@ -684,6 +692,8 @@ export default function IlhamPage({ onBack }) {
   function openStory(index) {
     setActiveStoryIndex(index);
     setStoryModalVisible(true);
+    const pic = STORY_PICS[index % STORY_PICS.length]; 
+    setBackgroundSource(STORY_PICS[pic]);
   }
 
   function closeStory() {
@@ -812,48 +822,50 @@ export default function IlhamPage({ onBack }) {
       {/* STORY MODAL */}
       <Modal visible={storyModalVisible} transparent animationType="fade" onRequestClose={closeStory} >
         <View style={styles.storyModalOverlay}>
-          <View style={styles.storyModalCard}>
-            {STORY_ITEMS[activeStoryIndex] && (
-              <>
-                <Text style={styles.storyModalCategory}>
-                  {CATEGORIES.find( (c) => c.key === STORY_ITEMS[activeStoryIndex].category )?.label || "İlham"}
-                </Text>
-                <Text style={styles.storyModalTitle}>
-                  {STORY_ITEMS[activeStoryIndex].title}
-                </Text>
-                <ScrollView style={{ marginTop: 8 }} showsVerticalScrollIndicator={false} >
-                  <Text style={styles.storyModalText}>
-                    {STORY_ITEMS[activeStoryIndex].text}
+          <ImageBackground source={backgroundSource} style={styles.storyModalCardBackground} imageStyle={styles.storyModalCardImage} resizeMode="cover" > 
+            <View style={styles.storyModalCardInner}>
+              {STORY_ITEMS[activeStoryIndex] && (
+                <>
+                  <Text style={styles.storyModalCategory}>
+                    {CATEGORIES.find( (c) => c.key === STORY_ITEMS[activeStoryIndex].category )?.label || "İlham"}
                   </Text>
-                </ScrollView>
+                  <Text style={styles.storyModalTitle}>
+                    {STORY_ITEMS[activeStoryIndex].title}
+                  </Text>
+                  <ScrollView style={{ marginTop: 8 }} showsVerticalScrollIndicator={false} >
+                    <Text style={styles.storyModalText}>
+                      {STORY_ITEMS[activeStoryIndex].text}
+                    </Text>
+                  </ScrollView>
 
-                <View style={styles.storyModalButtonsRow}>
-                  <TouchableOpacity onPress={toggleLikeCurrentStory} style={styles.storyModalButton} >
-                    <Text style={styles.storyModalButtonText}>
-                      {likedStories[STORY_ITEMS[activeStoryIndex].id] ? "♥ Beğenildi" : "♡ Beğen"} </Text>
-                  </TouchableOpacity>
+                  <View style={styles.storyModalButtonsRow}>
+                    <TouchableOpacity onPress={toggleLikeCurrentStory} style={styles.storyModalButton} >
+                      <Text style={styles.storyModalButtonText}>
+                        {likedStories[STORY_ITEMS[activeStoryIndex].id] ? "♥ Beğenildi" : "♡ Beğen"} </Text>
+                    </TouchableOpacity>
 
-                  <TouchableOpacity onPress={() => shareText( STORY_ITEMS[activeStoryIndex].text, STORY_ITEMS[activeStoryIndex].title ) } style={styles.storyModalButton} >
-                    <Text style={styles.storyModalButtonText}>↗ Paylaş</Text>
-                  </TouchableOpacity>
-                </View>
+                    <TouchableOpacity onPress={() => shareText( STORY_ITEMS[activeStoryIndex].text, STORY_ITEMS[activeStoryIndex].title ) } style={styles.storyModalButton} >
+                      <Text style={styles.storyModalButtonText}>↗ Paylaş</Text>
+                    </TouchableOpacity>
+                  </View>
 
-                <View style={styles.storyModalFooterNav}>
-                  <TouchableOpacity onPress={handlePrevStory} disabled={activeStoryIndex === 0} style={[ styles.storyNavBtn, activeStoryIndex === 0 && styles.storyNavBtnDisabled, ]} >
-                    <Text style={styles.storyNavText}>Önceki</Text>
-                  </TouchableOpacity>
+                  <View style={styles.storyModalFooterNav}>
+                    <TouchableOpacity onPress={handlePrevStory} disabled={activeStoryIndex === 0} style={[ styles.storyNavBtn, activeStoryIndex === 0 && styles.storyNavBtnDisabled, ]} >
+                      <Text style={styles.storyNavText}>Önceki</Text>
+                    </TouchableOpacity>
 
-                  <TouchableOpacity onPress={closeStory} style={styles.storyNavBtn}>
-                    <Text style={styles.storyNavText}>Kapat</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity onPress={closeStory} style={styles.storyNavBtn}>
+                      <Text style={styles.storyNavText}>Kapat</Text>
+                    </TouchableOpacity>
 
-                  <TouchableOpacity onPress={handleNextStory} style={styles.storyNavBtn}  >
-                    <Text style={styles.storyNavText}> {activeStoryIndex === STORY_ITEMS.length - 1 ? "Bitir" : "Sonraki"} </Text>
-                  </TouchableOpacity>
-                </View>
-              </>
-            )}
-          </View>
+                    <TouchableOpacity onPress={handleNextStory} style={styles.storyNavBtn}  >
+                      <Text style={styles.storyNavText}> {activeStoryIndex === STORY_ITEMS.length - 1 ? "Bitir" : "Sonraki"} </Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
+              )}
+            </View>
+          </ImageBackground>
         </View>
       </Modal>
 
@@ -899,7 +911,6 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
     justifyContent: "flex-start",
   },
-
   ilhamTitle: {
     fontSize: 24,
     fontWeight: "700",
@@ -936,7 +947,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#ffdd55",
     marginBottom: 4,
-    alignText:'center'
+    textAlign: "center",
   },
 
   // Categories
@@ -975,7 +986,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     // marginBottom : 50
-    // backgroundColor: "rgba(255, 0, 0, 0.88)",
   },
   feedColumn: {
     flex: 1,
@@ -1009,19 +1019,10 @@ const styles = StyleSheet.create({
   // Story modal
   storyModalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.8)",
+    backgroundColor: "rgba(0, 0, 0, 0.63)",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 16,
-  },
-  storyModalCard: {
-    width: "100%",
-    maxHeight: "80%",
-    borderRadius: 20,
-    padding: 16,
-    backgroundColor: "rgba(10,10,15,0.96)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.2)",
   },
   storyModalCategory: {
     fontSize: 13,
@@ -1034,6 +1035,27 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginBottom: 4,
   },
+  storyModalCardBackground: {
+    width: "100%",
+    height: "55%",
+    borderRadius: 20,
+    overflow: "hidden", // must-have!
+  },
+  storyModalCardImage: {
+    borderRadius: 20,
+  },
+  storyModalCardInner: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: "rgba(10,10,15,0.85)", // translucent so image shows through
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+  },
+  storyModalContent: {
+  flex: 1,
+  padding: 16,
+  backgroundColor: "rgba(202, 202, 202, 0.13)", // semi-dark layer to make text readable
+},
   storyModalText: {
     fontSize: 15,
     color: "#e5e5f0",
