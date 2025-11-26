@@ -899,11 +899,12 @@ export default function IlhamPage({ onBack }) {
 
               {/* --- RIGHT INVISIBLE TAP ZONE --- */}
               <TouchableOpacity onPress={handleNextStory} style={styles.storyRightZone} activeOpacity={1} />
+
               <View style={styles.storyModalCardInner}>
                 {STORY_ITEMS[activeStoryIndex] && (
                   <>
-                    {/* Category */}
                     <View style={styles.storyModalTopContent}>
+                      {/* Category */}
                       <Text style={styles.storyModalCategory}>
                         {CATEGORIES.find( (c) => c.key === STORY_ITEMS[activeStoryIndex].category)?.label || "İlham"}
                       </Text>
@@ -948,23 +949,32 @@ export default function IlhamPage({ onBack }) {
 
           {/* Actual popup card – NOT inside the background touchable */}
           <ImageBackground source={feedBackgroundSource} style={styles.itemModalCardBackground} imageStyle={styles.itemModalCardImage} resizeMode="cover" >
-            <View style={styles.itemModalCard}>
-              {selectedItem && ( 
-                <> 
-                <Text style={styles.itemModalType}> {getTypeLabel(selectedItem.type)} </Text> 
-                <Text style={styles.itemModalTitle}>{selectedItem.title}</Text> 
-                {selectedItem.ref ? ( <Text style={styles.itemModalRef}>{selectedItem.ref}</Text> ) : null} 
-                <ScrollView style={{ marginTop: 8 }} showsVerticalScrollIndicator={false} > 
-                  <Text style={styles.itemModalText}>{selectedItem.text}</Text> 
-                </ScrollView> 
+            <View style={{ flex: 1 }}>
+              <View style={styles.itemModalCardInner}>
+                {selectedItem && ( 
+                  <> 
+                  <View style={styles.itemModalTopContent}>
+                    {/* Category */}
+                    <Text style={styles.itemModalType}> {getTypeLabel(selectedItem.type)} </Text> 
 
-                <View style={styles.itemModalButtonsRow}>
-                  <TouchableOpacity style={styles.itemModalButton} onPress={() => shareText( `${selectedItem.title}\n${selectedItem.ref || ""}\n\n${ selectedItem.text }`, "İlham" )  } >
-                    <Text style={styles.itemModalButtonText}>↗ Paylaş</Text>
-                  </TouchableOpacity> 
-                </View> 
-              </> )} 
-            </View> 
+                    {/* Title */}
+                    <Text style={styles.itemModalTitle}>{selectedItem.title}</Text> 
+
+                    {/* Ref */}
+                    {selectedItem.ref ? ( <Text style={styles.itemModalRef}>{selectedItem.ref}</Text> ) : null} 
+
+                    {/* Text */}
+                    <Text style={styles.itemModalText}>{selectedItem.text}</Text> 
+                  </View>
+
+                  <View style={styles.itemModalButtonsRow}>
+                    <TouchableOpacity style={styles.itemModalButton} onPress={() => shareText( `${selectedItem.title}\n${selectedItem.ref || ""}\n\n${ selectedItem.text }`, "İlham" )  } >
+                      <Text style={styles.itemModalButtonText}>↗ Paylaş</Text>
+                    </TouchableOpacity> 
+                  </View> 
+                </> )} 
+              </View>
+            </View>
           </ImageBackground>
         </View> 
       </Modal>
@@ -1176,15 +1186,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
   },
-  itemModalCard: {
-    width: "100%",
-    maxHeight: "80%",
-    borderRadius: 20,
-    padding: 16,
+  itemModalCardInner: {
+    flex: 1,
+    padding: 25,
+    backgroundColor: "rgba(10, 10, 15, 0.34)",
+    borderWidth: 1,
     borderColor: "rgba(255,255,255,0.2)",
     overflow: "hidden",  
-    flex: 1,
     justifyContent: "space-between",  
+  },
+  itemModalTopContent: {
+    flex: 1
   },
   itemModalCardImage: {
     borderRadius: 20,
@@ -1213,6 +1225,10 @@ const styles = StyleSheet.create({
   itemModalButtonsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: "rgba(255,255,255,0.25)",
   },
   itemModalButton: {
     flex: 1,
