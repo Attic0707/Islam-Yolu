@@ -903,17 +903,17 @@ export default function IlhamPage({ onBack }) {
                 {STORY_ITEMS[activeStoryIndex] && (
                   <>
                     {/* Category */}
-                    <Text style={styles.storyModalCategory}>
-                      {CATEGORIES.find( (c) => c.key === STORY_ITEMS[activeStoryIndex].category)?.label || "İlham"}
-                    </Text>
+                    <View style={styles.storyModalTopContent}>
+                      <Text style={styles.storyModalCategory}>
+                        {CATEGORIES.find( (c) => c.key === STORY_ITEMS[activeStoryIndex].category)?.label || "İlham"}
+                      </Text>
 
-                    {/* Title */}
-                    <Text style={styles.storyModalTitle}>
-                      {STORY_ITEMS[activeStoryIndex].title}
-                    </Text>
+                      {/* Title */}
+                      <Text style={styles.storyModalTitle}>
+                        {STORY_ITEMS[activeStoryIndex].title}
+                      </Text>
 
-                    {/* Text */}
-                    <View style={{ marginTop: 8 }} {...storyPanResponder.panHandlers} >
+                      {/* Text */}
                       <Text style={styles.storyModalText}>
                         {STORY_ITEMS[activeStoryIndex].text}
                       </Text>
@@ -1113,7 +1113,7 @@ const styles = StyleSheet.create({
   },
   storyModalCardInner: {
     flex: 1,
-    padding: 16,
+    padding: 25,
     backgroundColor: "rgba(10, 10, 15, 0.34)",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.2)",
@@ -1123,10 +1123,16 @@ const styles = StyleSheet.create({
     color: "#e5e5f0",
     lineHeight: 22,
   },
+  storyModalTopContent: {
+    flex: 1,
+  },
   storyModalButtonsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: "rgba(255,255,255,0.25)",
   },
   storyModalButton: {
     flex: 1,
