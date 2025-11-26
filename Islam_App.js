@@ -365,6 +365,7 @@ export default function Islam_App() {
         const triggerDate = new Date(now);
         triggerDate.setHours(t.hour, t.minute, 0, 0);
 
+        // if today's vakit already passed, schedule for tomorrow
         if (triggerDate <= now) {
           triggerDate.setDate(triggerDate.getDate() + 1);
         }
@@ -373,9 +374,11 @@ export default function Islam_App() {
           content: {
             title: `${t.name} ezanı 🕋`,
             body: `${t.name} vakti geldi. Allah kabul etsin.`,
-            sound: "adhan.wav",
           },
-          trigger: triggerDate,
+          trigger: {
+            type: "date",
+            date: triggerDate,
+          },
           channelId: "prayer-channel",
         });
       }
