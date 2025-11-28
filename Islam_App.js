@@ -32,6 +32,7 @@ import OtuzIkiFarzPage from "./files/OtuzIkiFarzPage";
 import EsmaPage from "./files/EsmaPage";
 import IlmihalPage from "./files/IlmihalPage";
 import QuranPage from "./files/QuranPage";
+import TecvidPage from "./files/TecvidPage";
 import KuranFihristiPage from "./files/KuranFihristiPage";
 import HadisFihristiPage from "./files/HadisFihristiPage";
 import SecmeAyetlerPage from "./files/SecmeAyetlerPage";
@@ -115,6 +116,7 @@ const MENU_ITEMS = [
   { key: "esmaul_husna",        label: "Esma’ül Hüsna ile Zikir" },
   { key: "islam_ilmihali",      label: "İlmihal Rehberi" },
   { key: "kurani_kerim",        label: "Kur’an-ı Kerim Tam Metin" },
+  { key: "tecvid",              label: "Tecvidli okumayı öğren" },
   { key: "kuran_fihristi",      label: "Kur’an Konu Dizini" },
   { key: "hadis_fihristi",      label: "Hadis Konu Dizini" },
   { key: "yedis_yuz_ucyuz_hadis", label: "Hadis Arşivi (7300+)" },
@@ -432,6 +434,7 @@ export default function Islam_App() {
       case "islam_ilmihali":
       case "kuran_fihristi":
       case "kurani_kerim":
+      case "tecvid":
       case "hadis_fihristi":
       case "secme_ayetler":
       case "guzel_dualar":
@@ -491,6 +494,7 @@ export default function Islam_App() {
       kurani_kerim: require("./assets/icons/iconPack/quran.png"),
       kuran_fihristi: require("./assets/icons/iconPack/index1.png"),
       hadis_fihristi: require("./assets/icons/iconPack/index2.png"),
+      tecvid: require("./assets/icons/iconPack/quran.png"),
       yedis_yuz_ucyuz_hadis: require("./assets/icons/iconPack/quotes.png"),
       secme_ayetler: require("./assets/icons/iconPack/selected.png"),
       guzel_dualar: require("./assets/icons/iconPack/dua.png"),
@@ -678,6 +682,13 @@ export default function Islam_App() {
           ======================= */}
       {activePage === "kurani_kerim" && (
         <QuranPage onBack={() => setActivePage("home")} />
+      )}
+
+      {/* =======================
+          KURAN FİHRİST PAGE
+          ======================= */}
+      {activePage === "tecvid" && (
+        <TecvidPage onBack={() => setActivePage("home")} />
       )}
 
       {/* =======================

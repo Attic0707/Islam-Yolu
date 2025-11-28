@@ -113,13 +113,13 @@ export default function QuranPage({ onBack }) {
     setChapterModalVisible(false);
   }
 
-  function goNextPage() {
+  function goPrevPage() { 
     if (page < totalPages) {
       setPage((p) => p + 1);
     }
   }
 
-  function goPrevPage() {
+  function goNextPage() {
     if (page > 1) {
       setPage((p) => p - 1);
     }
@@ -206,42 +206,16 @@ export default function QuranPage({ onBack }) {
               </ScrollView>
             )}
 
-            {/* Page controls – right-to-left semantics:
-                Next page button on the LEFT, previous on the RIGHT */}
             <View style={styles.paginationRow}>
-              <TouchableOpacity
-                style={[
-                  styles.pageButton,
-                  page >= totalPages && styles.pageButtonDisabled,
-                ]}
-                onPress={goNextPage}
-                disabled={page >= totalPages}
-              >
-                <Text
-                  style={[
-                    styles.pageButtonText,
-                    page >= totalPages && styles.pageButtonTextDisabled,
-                  ]}
-                >
-                  Sonraki sayfa →
+              <TouchableOpacity style={[ styles.pageButton, page <= 1 && styles.pageButtonDisabled, ]} onPress={goNextPage} disabled={page <= 1} > 
+                <Text style={[ styles.pageButtonText, page >= totalPages && styles.pageButtonTextDisabled, ]} >
+                  Önceki sayfa →
                 </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[
-                  styles.pageButton,
-                  page <= 1 && styles.pageButtonDisabled,
-                ]}
-                onPress={goPrevPage}
-                disabled={page <= 1}
-              >
-                <Text
-                  style={[
-                    styles.pageButtonText,
-                    page <= 1 && styles.pageButtonTextDisabled,
-                  ]}
-                >
-                  ← Önceki sayfa
+              <TouchableOpacity style={[ styles.pageButton, page >= totalPages && styles.pageButtonDisabled, ]} onPress={goPrevPage}  disabled={page >= totalPages} >
+                <Text style={[ styles.pageButtonText, page <= 1 && styles.pageButtonTextDisabled, ]} >
+                  ← Sonraki sayfa
                 </Text>
               </TouchableOpacity>
             </View>
@@ -280,7 +254,7 @@ export default function QuranPage({ onBack }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#021708c9", // dark navy
+    backgroundColor: "#021708c9",
     paddingTop: 60,
     paddingHorizontal: 20
   },
