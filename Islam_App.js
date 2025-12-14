@@ -205,6 +205,7 @@ export default function Islam_App() {
         }
 
         setSettings(effectiveSettings);
+        await ensureAndroidNotificationChannel();
         await requestNotificationPermissions();
         await scheduleDailyNotifications(effectiveSettings);
         const idx = Math.floor(Math.random() * BACKGROUNDS.length);
@@ -320,6 +321,18 @@ export default function Islam_App() {
       Alert.alert("Hata", "Namaz vakitleri alınırken bir sorun oluştu.");
       return null;
     }
+  }
+
+  async function ensureAndroidNotificationChannel() {
+    if (Platform.OS !== "android") return;
+
+    await Notifications.setNotificationChannelAsync("prayer-channel", {
+      name: "Ezan Bildirimleri",
+      importance: Notifications.AndroidImportance.HIGH,
+      sound: "default",
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: "#FFDD55",
+    });
   }
 
   async function scheduleDailyNotifications(overrideSettings) {
