@@ -42,7 +42,7 @@
   "submit": {
     "production": {
       "android": {
-        "serviceAccountKeyPath": "~/.eas/keys/google-play-key.json",
+        "serviceAccountKeyPath": "~/.eas/keys/islam-yolu-481407-8d7a648134ea.json",
         "track": "internal"
       }
     },
