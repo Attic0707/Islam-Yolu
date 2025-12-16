@@ -27,7 +27,7 @@
       }
     },
     "android": {
-      "package": "com.islamyolu",
+      "package": "com.tavanarasi.islamyolu",
       "versionCode": 18,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/iconPack/appIcon.png",
