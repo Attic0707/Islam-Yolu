@@ -45,7 +45,8 @@
           "androidAppId": "ca-app-pub-8919233762784771~6883670790",
           "iosAppId": "ca-app-pub-8919233762784771~5248594885"
         }
-      ]
+      ],
+      "./plugins/fixAndroidKotlinPackage"
     ],
     "extra": {
       "eas": {
