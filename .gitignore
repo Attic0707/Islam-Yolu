@@ -103,3 +103,11 @@ privacy policy (TR).txt
 terms and conditions (ENG).txt
 terms and conditions (TR).txt
 seo.txt
+
+# Google Play service account keys
+*.json
+
+# (optional, safer) ignore any local keys folders
+.eas/
+keys/
+*.keystore

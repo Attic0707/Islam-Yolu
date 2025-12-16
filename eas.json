@@ -40,7 +40,12 @@
     }
   },
   "submit": {
-    "production": {},
+    "production": {
+      "android": {
+        "serviceAccountKeyPath": "~/.eas/keys/google-play-key.json",
+        "track": "internal"
+      }
+    },
     "preview-ios-store": {}
   }
 }
