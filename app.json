@@ -14,9 +14,7 @@
       "resizeMode": "cover",
       "backgroundColor": "#000000"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "buildNumber": "19",
@@ -44,13 +42,6 @@
         {
           "androidAppId": "ca-app-pub-8919233762784771~6883670790",
           "iosAppId": "ca-app-pub-8919233762784771~5248594885"
-        }
-      ],
-      [
-        "react-native-purchases",
-        {
-          "iosApiKey": "app1dce1ec129",
-          "androidApiKey": ""
         }
       ],
       "./plugins/fixAndroidKotlinPackage"
