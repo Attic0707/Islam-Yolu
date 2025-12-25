@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { TouchableOpacity, View, Text, StyleSheet, ScrollView, Alert, } from "react-native";
+// files/NamazSureleriPage.js
+import React, { useEffect, useRef, useState } from "react";
+import { TouchableOpacity, View, Text, StyleSheet, ScrollView, Alert } from "react-native";
+import { Audio } from "expo-av";
 import ScaledText from "./ScaledText";
 
 export default function NamazSureleriPage({ onBack }) {
+  const [currentPlayingKey, setCurrentPlayingKey] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const soundRef = useRef(null);
 
   // ---- DATA ----
   const SECTIONS = [
@@ -26,6 +31,7 @@ Mâliki yevmiddîn.
 İyyâke na‘budu ve iyyâke neste‘în.
 İhdinessırâtel müstakîm.
 Sırâtallezîne en‘amte aleyhim ğayril mağdûbi aleyhim ve leddâllîn.`,
+          audio: require("../assets/sounds/fatiha.mp3"),
         },
         {
           key: "ikhlas",
@@ -40,6 +46,7 @@ Kul huvallâhu ehad.
 Allâhussamed.
 Lem yelid ve lem yûled.
 Ve lem yekun lehû kufuven ehad.`,
+          audio: require("../assets/sounds/ihlas.mp3"),
         },
         {
           key: "felak",
@@ -56,6 +63,7 @@ Min şerri mâ halak.
 Ve min şerri ğâsikın izâ vekab.
 Ve min şerrin-neffâsâti fil ‘ukad.
 Ve min şerri hâsidin izâ hased.`,
+          audio: require("../assets/sounds/felak.mp3"),
         },
         {
           key: "nas",
@@ -74,6 +82,7 @@ Melikin-nâs.
 Min şerril-vesvâsil-hannâs.
 Ellezî yuvesvisu fî sudûrin-nâs.
 Minel cinneti ven-nâs.`,
+          audio: require("../assets/sounds/nas.mp3"),
         },
         {
           key: "kevser",
@@ -86,6 +95,7 @@ Minel cinneti ven-nâs.`,
 İnnâ a‘taynâkel kevser.
 Fe-salli li rabbike venhar.
 İnne şâni’eke huvel ebter.`,
+          audio: require("../assets/sounds/kevser.mp3"),
         },
       ],
     },
@@ -105,28 +115,29 @@ Esselâmü aleyke eyyühen-nebiyyü ve rahmetullâhi ve berakâtüh.
 Esselâmü aleynâ ve alâ ibâdillâhissâlihîn.
 Eşhedü en lâ ilâhe illallâh
 ve eşhedü enne Muhammeden abdühû ve resûlüh.`,
+          audio: require("../assets/sounds/ettehiyyatu.mp3"),
         },
         {
           key: "salli",
           name: "Salli ve Bârik Duaları",
-          arabic: `اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَعَلٰى آلِ مُحَمَّدٍ
+          arabic: ` اَللّٰهُمَّ صَلِّ عَلٰى مُحَمَّدٍ وَعَلٰى آلِ مُحَمَّدٍ
 كَمَا صَلَّيْتَ عَلٰى اِبْرَاهٖيمَ وَعَلٰى آلِ اِبْرَاهٖيمَ
 اِنَّكَ حَمٖيدٌ مَجٖيدٌ`,
           roman: `Allâhümme salli alâ Muhammedin ve alâ âli Muhammed,
 kemâ salleyte alâ İbrâhîme ve alâ âli İbrâhîm,
 inneke hamîdün mecîd.`,
+          audio: require("../assets/sounds/salli.mp3"),
         },
         {
           key: "barik",
           name: "Salli ve Bârik Duaları",
           arabic: `اَللّٰهُمَّ بَارِكْ عَلٰى مُحَمَّدٍ وَعَلٰى آلِ مُحَمَّدٍ
 كَمَا بَارَكْتَ عَلٰى اِبْرَاهٖيمَ وَعَلٰى آلِ اِبْرَاهٖيمَ
-اِنَّكَ حَمٖيدٌ مَجٖيدٌ
-          `,
-          roman: `
-Allâhümme bârik alâ Muhammedin ve alâ âli Muhammed,
+اِنَّكَ حَمٖيدٌ مَجٖيدٌ`,
+          roman: `Allâhümme bârik alâ Muhammedin ve alâ âli Muhammed,
 kemâ bârekte alâ İbrâhîme ve alâ âli İbrâhîm,
 inneke hamîdün mecîd.`,
+          audio: require("../assets/sounds/barik.mp3"),
         },
         {
           key: "rabbenagfirli",
@@ -135,16 +146,86 @@ inneke hamîdün mecîd.`,
 وَلِلْمُؤْمِنٖينَ يَوْمَ يَقُومُ الْحِسَابُ`,
           roman: `Rabbenâğfir lî ve li vâlîdeyye
 ve lil-mü’minîne yevme yekûmul hisâb.`,
+          // no audio yet
         },
       ],
     },
   ];
 
+  async function stopCurrentSound() {
+    try {
+      if (soundRef.current) {
+        await soundRef.current.stopAsync();
+        await soundRef.current.unloadAsync();
+        soundRef.current = null;
+      }
+    } catch (e) {
+      console.log("stopCurrentSound error", e);
+    } finally {
+      setCurrentPlayingKey(null);
+      setIsPlaying(false);
+    }
+  }
+
+  async function handlePlayPress(item) {
+    try {
+      // toggle off if same item and currently playing
+      if (currentPlayingKey === item.key && isPlaying) {
+        await stopCurrentSound();
+        return;
+      }
+
+      if (!item.audio) {
+        Alert.alert("Ses bulunamadı", "Bu okuma için ses dosyası eklenmemiş.");
+        return;
+      }
+
+      // stop any existing sound
+      await stopCurrentSound();
+
+      const { sound } = await Audio.Sound.createAsync(item.audio);
+      soundRef.current = sound;
+
+      // when playback finishes, reset state
+      soundRef.current.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          stopCurrentSound();
+        }
+      });
+
+      setCurrentPlayingKey(item.key);
+      setIsPlaying(true);
+      await soundRef.current.playAsync();
+    } catch (e) {
+      console.log("Audio play error:", e);
+      Alert.alert("Hata", "Ses oynatılırken bir sorun oluştu.");
+      await stopCurrentSound();
+    }
+  }
+
+  useEffect(() => {
+    // cleanup on unmount
+    return () => {
+      stopCurrentSound();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <View style={[ styles.overlay, { justifyContent: "flex-start", paddingTop: 60, paddingHorizontal: 20 }, ]} >
+    <View
+      style={[
+        styles.overlay,
+        { justifyContent: "flex-start", paddingTop: 60, paddingHorizontal: 20 },
+      ]}
+    >
       {/* Back button */}
-      <TouchableOpacity onPress={{ onBack }} style={{ alignSelf: "flex-start", marginBottom: 10 }}  >
+      <TouchableOpacity
+        onPress={async () => {
+          await stopCurrentSound();
+          onBack();
+        }}
+        style={{ alignSelf: "flex-start", marginBottom: 10 }}
+      >
         <Text style={{ color: "#ffffff", fontSize: 18 }}>← </Text>
       </TouchableOpacity>
 
@@ -156,16 +237,41 @@ ve lil-mü’minîne yevme yekûmul hisâb.`,
             <Text style={styles.sectionTitle}>{section.title}</Text>
 
             {section.items.map((item) => {
+              const isItemPlaying = currentPlayingKey === item.key && isPlaying;
+
               return (
                 <View key={item.key} style={styles.card}>
                   <View style={styles.cardHeaderRow}>
                     <ScaledText baseSize={16} style={styles.surahName}>
                       {item.name}
                     </ScaledText>
+
+                    {item.audio && (
+                      <TouchableOpacity
+                        onPress={() => handlePlayPress(item)}
+                        style={[
+                          styles.audioButton,
+                          isItemPlaying && styles.audioButtonActive,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.audioButtonText,
+                            isItemPlaying && styles.audioButtonTextActive,
+                          ]}
+                        >
+                          {isItemPlaying ? "⏸ Durdur" : "▶ Dinle"}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
 
-                  <ScaledText baseSize={20} style={styles.surahArabic}>{item.arabic}</ScaledText>
-                  <ScaledText baseSize={20} style={styles.romanText}>{item.roman}</ScaledText>
+                  <ScaledText baseSize={20} style={styles.surahArabic}>
+                    {item.arabic}
+                  </ScaledText>
+                  <ScaledText baseSize={20} style={styles.romanText}>
+                    {item.roman}
+                  </ScaledText>
                 </View>
               );
             })}
