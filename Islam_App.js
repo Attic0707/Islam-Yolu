@@ -7,6 +7,7 @@ import TextSizeButton from "./files/TextSizeButton";
 import ScaledText from "./files/ScaledText";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useInterstitialAds } from "./files/useAds";
+import Purchases from "react-native-purchases";
 
 // pages
 import ImsakiyePage from "./files/ImsakiyePage";
@@ -72,17 +73,13 @@ Notifications.setNotificationHandler({
 let mobileAds = null;
 let BannerAd = null;
 let BannerAdSize = null;
-let InterstitialAd = null;
-let AdEventType = null;
 let TestIds = null;
-let INTERSTITIAL_AD_UNIT_ID = "";
 let BANNER_AD_UNIT_ID = "";
 
 const googleMobileAds = require("react-native-google-mobile-ads");
 mobileAds = googleMobileAds.default;
 BannerAd = googleMobileAds.BannerAd;
 BannerAdSize = googleMobileAds.BannerAdSize;
-InterstitialAd = googleMobileAds.InterstitialAd;
 AdEventType = googleMobileAds.AdEventType;
 TestIds = googleMobileAds.TestIds;
 
@@ -153,17 +150,18 @@ const PRAYER_NAMES = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 const defaultSettings = { soundEnabled: true, vibrationEnabled: true, darkTheme: true, notificationsEnabled: true, adsEnabled: true, };
 
 export default function Islam_App() {
+  const [isPremium, setIsPremium] = useState(false);
   const [settings, setSettings] = useState(defaultSettings);
   const [loading, setLoading] = useState(false);
   const [isScheduled, setIsScheduled] = useState(false);
   const [prayerTimes, setPrayerTimes] = useState([]);
+  const ANDROID_PRAYER_CHANNEL_ID = "prayer-channel-v2";
 
   const [activePage, setActivePage] = useState("home");
-
   const [isAppLibraryOpen, setIsAppLibraryOpen] = useState(false);
   const [backgroundSource, setBackgroundSource] = useState(BACKGROUNDS[0]);
   const [isRamadanNow, setIsRamadanNow] = useState(false);
-  const { maybeShowInterstitial } = useInterstitialAds(true);
+  const { maybeShowInterstitial } = useInterstitialAds(settings.adsEnabled && !isPremium);
 
   // check if ramazan
   useEffect(() => {
@@ -171,19 +169,6 @@ export default function Islam_App() {
       setIsRamadanNow(await isRamadan());
     }
     load();
-  }, []);
-
-  // ads config
-  useEffect(() => {
-    if (!mobileAds || !InterstitialAd || !AdEventType || !INTERSTITIAL_AD_UNIT_ID ) {
-      return;
-    }
-    mobileAds()
-      .initialize()
-      .then(() => {
-        if (DEBUG) console.log("Google Mobile Ads initialized");
-      })
-      .catch(() => {});
   }, []);
 
   // init
@@ -326,7 +311,7 @@ export default function Islam_App() {
   async function ensureAndroidNotificationChannel() {
     if (Platform.OS !== "android") return;
 
-    await Notifications.setNotificationChannelAsync("prayer-channel", {
+    await Notifications.setNotificationChannelAsync(ANDROID_PRAYER_CHANNEL_ID, {
       name: "Ezan Bildirimleri",
       importance: Notifications.AndroidImportance.HIGH,
       sound: "default",
@@ -365,16 +350,15 @@ export default function Islam_App() {
           triggerDate.setDate(triggerDate.getDate() + 1);
         }
 
+        const trigger = Platform.OS === "android" ? { channelId: ANDROID_PRAYER_CHANNEL_ID, date: triggerDate } : { date: triggerDate };
+
         await Notifications.scheduleNotificationAsync({
           content: {
-            title: `${t.name} ezanı 📢`,
-            body: `${t.name} vakti geldi. Allah kabul etsin.`,
+            title: `${t.name} ezanı `,
+            body: `${t.name} namazı vakti geldi. Allah kabul etsin.`,
+            sound: effectiveSettings.soundEnabled ? "default" : undefined,
           },
-          trigger: {
-            type: "date",
-            date: triggerDate,
-          },
-          channelId: "prayer-channel",
+          trigger,
         });
       }
 
@@ -414,7 +398,7 @@ export default function Islam_App() {
     const bigPages = [ "imsakiye", "dini_bayramlar", "takvim_arkasi", "iftarSayaci", "ilham", "namaz", "abdest", "namaz_sureleri", "yasin_suresi", "kaza_takip", "yakin_camiler", "ruyet", 
       "kirk_hadis", "veda_hutbesi", "otuziki_farz", "esmaul_husna", "islam_ilmihali", "kuran_fihristi", "tecvid", "hadis_fihristi", "secme_ayetler", "guzel_dualar", "salavatlar"];
 
-    if (bigPages.includes(key)) {
+    if (bigPages.includes(key) && settings.adsEnabled && !isPremium) {
       maybeShowInterstitial();
     }
     switch (key) {
@@ -852,6 +836,8 @@ export default function Islam_App() {
       {activePage === "settings" && (
         <SettingsPage
           onBack={() => setActivePage("home")}
+          isPremium={isPremium}
+          onGoPremium={() => setActivePage("premium")}
           onSettingsChanged={(newSettings) => {
             setSettings(newSettings);
             scheduleDailyNotifications(newSettings);
@@ -926,7 +912,7 @@ export default function Islam_App() {
       {/* =======================
           BANNER AD
           ======================= */}
-      {activePage === "home" && settings.adsEnabled && (
+      {activePage === "home" && settings.adsEnabled && !isPremium && BannerAd && (
         <View style={styles.adContainer}>
           <BannerAd
             unitId={BANNER_AD_UNIT_ID}

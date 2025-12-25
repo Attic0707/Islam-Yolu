@@ -86,7 +86,7 @@ export default function AboutPage({ onBack }) {
           </ScaledText>
 
           <TouchableOpacity
-            onPress={() => Linking.openURL("mailto:sametatik7@gmail.com")}
+            onPress={() => Linking.openURL("mailto:islamyoluapp@gmail.com")}
           >
             <ScaledText
               baseSize={14}
@@ -95,7 +95,7 @@ export default function AboutPage({ onBack }) {
                 textDecorationLine: "underline",
               }}
             >
-              E-posta: sametatiik7@gmail.com
+              E-posta: islamyoluapp@gmail.com
             </ScaledText>
           </TouchableOpacity>
 
@@ -131,7 +131,7 @@ export default function AboutPage({ onBack }) {
 
           {/* Version info */}
           <ScaledText baseSize={12} style={{ color: "#aaa", marginTop: 25, textAlign: "center", }} >
-            Sürüm: 1.1.16{"\n"}© 2025 - Tüm hakları saklıdır.
+            Sürüm: 1.1.19{"\n"}© 2025 - Tüm hakları saklıdır.
           </ScaledText>
         </View>
 

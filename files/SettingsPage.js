@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { TouchableOpacity, View, Text, StyleSheet, Alert, Switch, Share, } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function SettingsPage({ onBack, onSettingsChanged }) {
+export default function SettingsPage({ onBack, onSettingsChanged, isPremium = false, onGoPremium, }) {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -128,6 +128,27 @@ export default function SettingsPage({ onBack, onSettingsChanged }) {
         </TouchableOpacity>
       </View>
 
+      {/* ==== Premium / Ads section ==== */}
+      {isPremium ? (
+        <View style={styles.settingRow}>
+          <Text style={styles.settingLabel}>Reklamlar</Text>
+          <Text style={[ styles.settingLabel, { color: "#ffdd55", fontSize: 14, textAlign: "right", }, ]} >
+            Premium aktif – reklamlar kaldırıldı
+          </Text>
+        </View>
+      ) : (
+        <View style={styles.settingRow}>
+          <TouchableOpacity onPress={() => { if (onGoPremium) onGoPremium(); }} >
+            <Text style={[ styles.settingLabel, { color: "#ffdd55", fontWeight: "700" }, ]} >
+              Reklamları Kaldır (Premium)
+            </Text>
+            <Text style={{ color: "#ffffff", fontSize: 12, marginTop: 4, maxWidth: 260, }} >
+              Bir kerelik ödeme ile tüm reklamları kaldırın ve uygulamayı geliştirmemize destek olun.
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <TouchableOpacity onPress={save} style={styles.settingsSaveBtn}>
         <Text style={styles.settingsSaveText}>Kaydet</Text>
       </TouchableOpacity>
@@ -165,6 +186,7 @@ const styles = StyleSheet.create({
   settingLabel: {
     fontSize: 16,
     color: "#ffffff",
+    flexShrink: 1,
   },
   settingsSaveBtn: {
     marginTop: 20,

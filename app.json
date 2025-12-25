@@ -4,7 +4,7 @@
     "slug": "islam-app",
     "scheme": "islam-app",
     "description": "Namaz vakitleri, kıble pusulası, ilmihal, hadis, tesbih ve daha fazlasını bir arada sunan İslami araç seti.",
-    "version": "1.1.18",
+    "version": "1.1.19",
     "orientation": "portrait",
     "icon": "./assets/icons/iconPack/appIcon.png",
     "userInterfaceStyle": "light",
@@ -19,7 +19,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "18",
+      "buildNumber": "19",
       "bundleIdentifier": "com.anonymous.islam-app",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Konumunuzu, bulunduğunuz şehre göre namaz vakitlerini hesaplamak için kullanıyoruz.",
@@ -28,7 +28,7 @@
     },
     "android": {
       "package": "com.tavanarasi.islamyolu",
-      "versionCode": 18,
+      "versionCode": 19,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/iconPack/appIcon.png",
         "backgroundColor": "#ffffff"
@@ -44,6 +44,13 @@
         {
           "androidAppId": "ca-app-pub-8919233762784771~6883670790",
           "iosAppId": "ca-app-pub-8919233762784771~5248594885"
+        }
+      ],
+      [
+        "react-native-purchases",
+        {
+          "iosApiKey": "app1dce1ec129",
+          "androidApiKey": ""
         }
       ],
       "./plugins/fixAndroidKotlinPackage"

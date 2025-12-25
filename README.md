@@ -45,7 +45,7 @@
 
     <h2>İletişim</h2>
     <p>
-      E-posta: <a href="mailto:sametatiik7@gmail.com">sametatiik7@gmail.com</a>
+      E-posta: <a href="mailto:islamyoluapp@gmail.com">islamyoluapp@gmail.com</a>
     </p>
 
     <h2>Ek Bilgi</h2>
