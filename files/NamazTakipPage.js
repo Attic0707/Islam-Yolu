@@ -348,23 +348,14 @@ export default function NamazTakipPage({ onBack }) {
         ) : errorMsg ? (
           <Text style={styles.errorText}>{errorMsg}</Text>
         ) : (
-          <ScrollView
-            style={{ maxHeight: 400 }}
-            contentContainerStyle={{ paddingVertical: 8 }}
-          >
+          <View>
             {prayers.map((p) => {
               const checked = checkedPrayers[p.key];
               return (
-                <TouchableOpacity
-                  key={p.key}
-                  style={styles.checkRow}
-                  onPress={() => togglePrayer(p.key)}
-                  activeOpacity={0.7}
-                >
-                  <View style={[ styles.checkboxOuter, checked && styles.checkboxOuterChecked, ]}  >
+                <TouchableOpacity key={p.key} style={styles.checkRow} onPress={() => togglePrayer(p.key)} activeOpacity={0.7} >
+                    <View style={[ styles.checkboxOuter, checked && styles.checkboxOuterChecked, ]}  >
                     {checked && <View style={styles.checkboxInner} />}
                   </View>
-
                   <View style={styles.checkTextCol}>
                     <Text style={styles.checkPrayerName}>{p.label}</Text>
                     <Text style={styles.checkPrayerTime}>
@@ -374,7 +365,7 @@ export default function NamazTakipPage({ onBack }) {
                 </TouchableOpacity>
               );
             })}
-          </ScrollView>
+          </View>
         )}
       </View>
     </View>

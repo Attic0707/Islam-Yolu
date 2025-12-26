@@ -326,22 +326,55 @@ export default function Islam_App() {
     });
   }
 
+  async function ensureNotificationPermissions() {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+
+    if (existingStatus !== "granted") {
+      const { status: requestStatus } = await Notifications.requestPermissionsAsync();
+      finalStatus = requestStatus;
+    }
+
+    return finalStatus === "granted";
+  }
+
+  async function ensureAndroidChannel() {
+    if (Platform.OS !== "android") return;
+
+    await Notifications.setNotificationChannelAsync(ANDROID_PRAYER_CHANNEL_ID, {
+      name: "Ezan Bildirimleri",
+      importance: Notifications.AndroidImportance.HIGH,
+      sound: "default",
+    });
+  }
+
   async function scheduleDailyNotifications(overrideSettings) {
     try {
       const effectiveSettings = overrideSettings ?? settings;
 
-      // If ezan notifications are turned off in settings: cancel and exit
       if (!effectiveSettings.notificationsEnabled) {
         await Notifications.cancelAllScheduledNotificationsAsync();
         setIsScheduled(false);
         return;
       }
 
-      // Clear existing ones
+      const hasPermission = await ensureNotificationPermissions();
+      if (!hasPermission) {
+        Alert.alert(
+          "Bildirim izni yok",
+          "Bildirim gönderebilmemiz için ayarlardan izin vermen gerekiyor."
+        );
+        setIsScheduled(false);
+        return;
+      }
+
+      await ensureAndroidChannel();
+
       await Notifications.cancelAllScheduledNotificationsAsync();
 
       const times = await fetchTodayPrayerTimes();
-      if (!times) {
+      if (!times || !Array.isArray(times) || times.length === 0) {
+        setIsScheduled(false);
         return;
       }
 
@@ -349,18 +382,34 @@ export default function Islam_App() {
 
       for (const t of times) {
         const triggerDate = new Date(now);
-        triggerDate.setHours(t.hour, t.minute, 0, 0);
+        const hour = Number(t.hour);
+        const minute = Number(t.minute);
 
-        // if today's vakit already passed, schedule for tomorrow
+        if (Number.isNaN(hour) || Number.isNaN(minute)) {
+          continue;
+        }
+
+        triggerDate.setHours(hour, minute, 0, 0);
+
         if (triggerDate <= now) {
           triggerDate.setDate(triggerDate.getDate() + 1);
         }
 
-        const trigger = Platform.OS === "android" ? { channelId: ANDROID_PRAYER_CHANNEL_ID, date: triggerDate } : { date: triggerDate };
+        const trigger =
+          Platform.OS === "android"
+            ? {
+                type: Notifications.SchedulableTriggerInputTypes.DATE,
+                date: triggerDate,
+                channelId: ANDROID_PRAYER_CHANNEL_ID,
+              }
+            : {
+                type: Notifications.SchedulableTriggerInputTypes.DATE,
+                date: triggerDate,
+              };
 
-        await Notifications.scheduleNotificationAsync({
+        const id = await Notifications.scheduleNotificationAsync({
           content: {
-            title: `${t.name} ezanı `,
+            title: `${t.name} ezanı`,
             body: `${t.name} namazı vakti geldi. Allah kabul etsin.`,
             sound: effectiveSettings.soundEnabled ? "default" : undefined,
           },
@@ -370,8 +419,9 @@ export default function Islam_App() {
 
       setIsScheduled(true);
     } catch (error) {
-      if (DEBUG) console.log(error);
+      if (DEBUG) console.log("scheduleDailyNotifications ERROR:", error);
       Alert.alert("Hata", "Bildirimler ayarlanamadı.");
+      setIsScheduled(false);
     }
   }
 
@@ -532,7 +582,6 @@ export default function Islam_App() {
         <View style={styles.overlay}>
           {/* Top bar with menu + title */}
           <NamazTakipPage onBack={() => setActivePage("home")} />
-
         </View>
       )}
 
