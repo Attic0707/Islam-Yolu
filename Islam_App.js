@@ -57,7 +57,9 @@ import HacUmreRehberPage from "./files/HacUmreRehberPage";
 import SettingsPage from "./files/SettingsPage";
 import AboutPage from "./files/AboutPage";
 import HelpPage from "./files/HelpPage";
+import PaywallPage from "./files/PaywallPage";
 import DockBar from "./files/DockBar";
+import Constants from "expo-constants";
 
 const DEBUG = false;
 
@@ -76,14 +78,18 @@ let BannerAdSize = null;
 let TestIds = null;
 let BANNER_AD_UNIT_ID = "";
 
-const googleMobileAds = require("react-native-google-mobile-ads");
-mobileAds = googleMobileAds.default;
-BannerAd = googleMobileAds.BannerAd;
-BannerAdSize = googleMobileAds.BannerAdSize;
-AdEventType = googleMobileAds.AdEventType;
-TestIds = googleMobileAds.TestIds;
+const isExpoGo = Constants.appOwnership === "expo";
 
-BANNER_AD_UNIT_ID = __DEV__ ? TestIds.BANNER : Platform.select({ ios: "ca-app-pub-8919233762784771/1697907277", android: "ca-app-pub-8919233762784771/9174081776",});
+if(!isExpoGo) {
+  const googleMobileAds = require("react-native-google-mobile-ads");
+  mobileAds = googleMobileAds.default;
+  BannerAd = googleMobileAds.BannerAd;
+  BannerAdSize = googleMobileAds.BannerAdSize;
+  AdEventType = googleMobileAds.AdEventType;
+  TestIds = googleMobileAds.TestIds;
+  
+  BANNER_AD_UNIT_ID = __DEV__ ? TestIds.BANNER : Platform.select({ ios: "ca-app-pub-8919233762784771/1697907277", android: "ca-app-pub-8919233762784771/9174081776",});
+}
 
 const MENU_ITEMS = [
   { key: "imsakiye",            label: "Günlük İmsak ve Vakitler" },
@@ -449,6 +455,7 @@ export default function Islam_App() {
       case "settings":
       case "about":
       case "help":
+      case "paywall":
         setActivePage(key);
         break;
       default:
@@ -837,7 +844,7 @@ export default function Islam_App() {
         <SettingsPage
           onBack={() => setActivePage("home")}
           isPremium={isPremium}
-          onGoPremium={() => setActivePage("premium")}
+          onGoPremium={() => setActivePage("paywall")}
           onSettingsChanged={(newSettings) => {
             setSettings(newSettings);
             scheduleDailyNotifications(newSettings);
@@ -861,6 +868,13 @@ export default function Islam_App() {
           ======================= */}
       {activePage === "help" && (
         <HelpPage onBack={() => setActivePage("home")} />
+      )}
+
+      {/* =======================
+          PAYWALL PAGE
+          ======================= */}
+      {activePage === "paywall" && (
+        <PaywallPage onBack={() => setActivePage("home")} />
       )}
 
       {/* =======================
@@ -912,7 +926,7 @@ export default function Islam_App() {
       {/* =======================
           BANNER AD
           ======================= */}
-      {activePage === "home" && settings.adsEnabled && !isPremium && BannerAd && (
+      {activePage === "home" && settings.adsEnabled && BannerAd && BANNER_AD_UNIT_ID && (
         <View style={styles.adContainer}>
           <BannerAd
             unitId={BANNER_AD_UNIT_ID}

@@ -52,7 +52,7 @@ export default function AboutPage({ onBack }) {
               textAlign: "center",
             }}
           >
-            İslam App — Tüm İslami Araçlar Bir Arada
+            İslam Yolu — Tüm İslami Araçlar Bir Arada
           </ScaledText>
 
           <ScaledText baseSize={14} style={{ color: "#ddd", marginBottom: 10 }}>

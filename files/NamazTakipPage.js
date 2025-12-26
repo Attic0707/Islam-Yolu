@@ -266,28 +266,16 @@ export default function NamazTakipPage({ onBack }) {
         </View>
 
         <View style={styles.headerNavRow}>
-          <TouchableOpacity
-            style={styles.navBtn}
-            onPress={() => setDateOffset((d) => d - 1)}
-          >
-            <Text style={styles.navBtnText}>← Önceki</Text>
+          <TouchableOpacity style={styles.navBtn} onPress={() => setDateOffset((d) => d - 1)} >
+            <Text style={styles.navBtnText}>← Önceki gün</Text>
           </TouchableOpacity>
 
           <Text style={styles.navCenterText}>
-            {dateOffset === 0
-              ? "Bugün"
-              : `${dateOffset > 0 ? "+" : ""}${dateOffset} gün`}
+            {dateOffset === 0 ? "Bugün" : null}
           </Text>
 
-          <TouchableOpacity
-            style={[
-              styles.navBtn,
-              dateOffset === 0 && { opacity: 0.4 },
-            ]}
-            disabled={dateOffset === 0}
-            onPress={() => setDateOffset((d) => Math.min(0, d + 1))}
-          >
-            <Text style={styles.navBtnText}>Sonraki →</Text>
+          <TouchableOpacity style={[ styles.navBtn, dateOffset === 0 && { opacity: 0.4 }, ]} disabled={dateOffset === 0} onPress={() => setDateOffset((d) => Math.min(0, d + 1))} >
+            <Text style={styles.navBtnText}>Sonraki gün →</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -310,7 +298,7 @@ export default function NamazTakipPage({ onBack }) {
                 {nextInfo.hours > 0
                   ? `${nextInfo.hours} s `
                   : ""}
-                {nextInfo.minutes} d kaldı
+                {nextInfo.minutes} dk kaldı
               </Text>
             </>
           ) : (

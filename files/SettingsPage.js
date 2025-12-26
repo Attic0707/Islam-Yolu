@@ -112,41 +112,40 @@ export default function SettingsPage({ onBack, onSettingsChanged, isPremium = fa
         />
       </View>
 
-      <View style={styles.settingRow}>
-        <TouchableOpacity onPress={triggerBackgroundChange} disabled={cooldown}>
-          <Text style={[styles.settingLabel, cooldown && { opacity: 0.5 }]}  >
-            Arka Plan Değiştir
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity style={styles.settingRow} onPress={triggerBackgroundChange} disabled={cooldown}>
+        <Text style={[styles.settingLabel, cooldown && { opacity: 0.5 }]}  >
+          Arka Plan Değiştir
+        </Text>
+      </TouchableOpacity>
 
-      <View style={styles.settingRow}>
-        <TouchableOpacity onPress={shareTheApp} disabled={cooldown}>
-          <Text style={[styles.settingLabel, cooldown && { opacity: 0.5 }]}  >
-            İslam Yolu'nu Paylaş
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity style={styles.settingRow} onPress={shareTheApp} disabled={cooldown}>
+        <Text style={[styles.settingLabel, cooldown && { opacity: 0.5 }]}  >
+          İslam Yolu'nu Paylaş
+        </Text>
+      </TouchableOpacity>
 
       {/* ==== Premium / Ads section ==== */}
       {isPremium ? (
-        <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Reklamlar</Text>
-          <Text style={[ styles.settingLabel, { color: "#ffdd55", fontSize: 14, textAlign: "right", }, ]} >
-            Premium aktif – reklamlar kaldırıldı
-          </Text>
+        <View style={[styles.premiumActiveBox]}>
+          <Text style={[styles.premiumActiveTitle]}>🌟 Premium Aktif</Text>
+          <Text style={styles.premiumActiveSubtitle}>Reklamlar kaldırıldı - Allah razı olsun </Text>
         </View>
       ) : (
-        <View style={styles.settingRow}>
-          <TouchableOpacity onPress={() => { if (onGoPremium) onGoPremium(); }} >
-            <Text style={[ styles.settingLabel, { color: "#ffdd55", fontWeight: "700" }, ]} >
-              Reklamları Kaldır (Premium)
-            </Text>
-            <Text style={{ color: "#ffffff", fontSize: 12, marginTop: 4, maxWidth: 260, }} >
-              Bir kerelik ödeme ile tüm reklamları kaldırın ve uygulamayı geliştirmemize destek olun.
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={styles.premiumBox} onPress={() => onGoPremium && onGoPremium()}>
+          <Text style={styles.premiumTitle}>Reklamları Kaldır</Text>
+          <Text style={styles.premiumSubtitle}>
+            Preimum sürüme geçerek ömür boyu reklamsız kullanın.
+          </Text>
+
+          <View style={styles.benefitsList}>
+            <Text style={styles.benefitLine}> Tüm reklamlar kaldırılır</Text>
+            <Text style={styles.benefitLine}> Uygulamanın gelişimine destek olun 💛</Text>
+          </View>
+
+          <View style={styles.premiumButton}>
+            <Text style={styles.premiumButtonText}>Premium’a Geç</Text>
+          </View>
+        </TouchableOpacity>
       )}
 
       <TouchableOpacity onPress={save} style={styles.settingsSaveBtn}>
@@ -200,4 +199,74 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#333333",
   },
+premiumBox: {
+  backgroundColor: "rgba(255, 221, 85, 0.10)",
+  borderWidth: 1.5,
+  borderColor: "rgba(255, 221, 85, 0.8)",
+  borderRadius: 14,
+  padding: 16,
+  marginTop: 20,
+},
+
+premiumTitle: {
+  fontSize: 18,
+  fontWeight: "700",
+  color: "#ffdd55",
+  marginBottom: 4,
+},
+
+premiumSubtitle: {
+  fontSize: 13,
+  color: "#ffffff",
+  opacity: 0.85,
+  marginBottom: 10,
+},
+
+benefitsList: {
+  marginVertical: 6,
+},
+
+benefitLine: {
+  color: "#ffffff",
+  fontSize: 13,
+  marginBottom: 4,
+  opacity: 0.9,
+},
+
+premiumButton: {
+  marginTop: 12,
+  backgroundColor: "#ffdd55",
+  paddingVertical: 10,
+  borderRadius: 10,
+  alignItems: "center",
+},
+
+premiumButtonText: {
+  fontWeight: "700",
+  fontSize: 15,
+  color: "#333333",
+},
+
+// --- active premium ---
+premiumActiveBox: {
+  backgroundColor: "rgba(255, 221, 85, 0.15)",
+  borderColor: "#ffdd55",
+  borderWidth: 1.5,
+  borderRadius: 14,
+  padding: 16,
+  marginTop: 20,
+},
+
+premiumActiveTitle: {
+  fontSize: 18,
+  fontWeight: "700",
+  color: "#ffdd55",
+  marginBottom: 6,
+},
+
+premiumActiveSubtitle: {
+  fontSize: 13,
+  color: "#ffffff",
+  opacity: 0.85,
+},
 });
