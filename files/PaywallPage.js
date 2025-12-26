@@ -1,73 +1,50 @@
 // files/PaywallPage.js
 import React, { useState } from "react";
-import {
-  TouchableOpacity,
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Linking,
-  Alert,
-} from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, Linking, Alert} from "react-native";
 import ScaledText from "./ScaledText";
 
 const PLANS = [
   {
     id: "islam_yolu_premium_monthly",
-    title: "Aylık Premium",
-    subtitle: "Esnek, istediğin zaman iptal et",
+    title: "Aylık Abonelik",
+    subtitle: "Esnektir. istediğiniz zaman iptal edebilirsiniz.",
     price: "₺49,99 / ay",
     tag: "Başlamak için ideal",
   },
   {
     id: "islam_yolu_premium_yearly",
-    title: "Yıllık Premium",
-    subtitle: "12 ay huzurlu kullanım",
+    title: "Yıllık Abonelik",
+    subtitle: "12 ay gönül rahatlığıyla kullanabilirsiniz.",
     price: "₺299,99 / yıl",
-    tag: "En çok tercih edilen",
+    tag: "",
     recommended: true,
   },
   {
     id: "premium_islamyolu_lifetime",
-    title: "Ömür Boyu Premium",
-    subtitle: "Tek seferlik ödeme, ömür boyu erişim",
+    title: "Ömür Boyu Erişim",
+    subtitle: "Tek seferlik ödeme ile ömür boyu kullanabilirsiniz.",
     price: "₺1.499,99",
     tag: "Bir kere öde, hep kullan",
   },
 ];
 
-export default function PaywallPage({
-  onBack,
-  onPurchase, // (productId) => void
-  onRestore,  // () => void
-}) {
+export default function PaywallPage({ onBack, onPurchase, onRestore }) {
   const [selectedPlanId, setSelectedPlanId] = useState(
     "islam_yolu_premium_yearly"
   );
 
-  const selectedPlan =
-    PLANS.find((p) => p.id === selectedPlanId) || PLANS[1] || PLANS[0];
+  const selectedPlan = PLANS.find((p) => p.id === selectedPlanId) || PLANS[1] || PLANS[0];
 
   function handleConfirmPurchase() {
     if (onPurchase) {
       onPurchase(selectedPlan.id);
-    } else {
-      Alert.alert(
-        "Demo",
-        `Seçilen ürün: ${selectedPlan.title}\n\nGerçek satın alma mantığını RevenueCat ile bağlayacağız.`
-      );
-    }
+    } 
   }
 
   function handleRestore() {
     if (onRestore) {
       onRestore();
-    } else {
-      Alert.alert(
-        "Demo",
-        "Satın alımları geri yükleme mantığı henüz bağlanmadı."
-      );
-    }
+    } 
   }
 
   function openPrivacy() {
@@ -86,29 +63,26 @@ export default function PaywallPage({
 
   return (
     <View style={styles.root}>
-      {/* Decorative Islamic background elements */}
       <View style={styles.decorLayer}>
         <View style={[styles.decorCircle, styles.decorCircleLarge]} />
         <View style={[styles.decorCircle, styles.decorCircleSmall]} />
-        <Text style={[styles.decorIcon, { top: 140, right: 40 }]}>☪</Text>
         <Text style={[styles.decorIcon, { top: 220, left: 40 }]}>✶</Text>
       </View>
 
-      {/* Content overlay */}
       <View style={styles.overlay}>
           {/* Top section: badge + title + subtitle */}
           <View>
-            <View style={styles.pill}>
-              <Text style={styles.pillText}>Reklamsız Premium Deneyim</Text>
-            </View>
-
             <ScaledText baseSize={26} style={styles.title}>
-              İslam Yolu Premium
+              İslam Yolu Pro
             </ScaledText>
+
+            <View style={styles.pill}>
+              <Text style={styles.pillText}>Reklamsız Deneyim</Text>
+            </View>
 
             {/* Benefits */}
             <View style={styles.benefitsBox}>
-              <Text style={styles.benefitsTitle}>Premium ile neler açılır?</Text>
+              <Text style={styles.benefitsTitle}>Pro ile neler açılır?</Text>
 
               <View style={styles.benefitRow}>
                 <Text style={styles.benefitIcon}>☑</Text>
@@ -120,7 +94,14 @@ export default function PaywallPage({
               <View style={styles.benefitRow}>
                 <Text style={styles.benefitIcon}>☑</Text>
                 <Text style={styles.benefitText}>
-                  Yeni özelliklerin daha hızlı gelmesine katkı sağlarsın.
+                  Yeni özelliklerin daha hızlı gelmesine vesile olursun.
+                </Text>
+              </View>
+
+              <View style={styles.benefitRow}>
+                <Text style={styles.benefitIcon}>☑</Text>
+                <Text style={styles.benefitText}>
+                  Uygulamayı geliştirmemize destek olarak daha fazla müslümana ulaşmamıza yardımcı olursun.
                 </Text>
               </View>
             </View>
@@ -139,8 +120,7 @@ export default function PaywallPage({
                   style={[
                     styles.planCard,
                     isActive && styles.planCardActive,
-                  ]}
-                >
+                  ]} >
                   {/* Badge */}
                   {plan.recommended && (
                     <View style={styles.recommendedBadge}>
@@ -152,12 +132,7 @@ export default function PaywallPage({
 
                   <View style={styles.planRow}>
                     <View style={{ flex: 1 }}>
-                      <Text
-                        style={[
-                          styles.planTitle,
-                          isActive && styles.planTitleActive,
-                        ]}
-                      >
+                      <Text style={[ styles.planTitle, isActive && styles.planTitleActive, ]} >
                         {plan.title}
                       </Text>
                       <Text style={styles.planSubtitle}>{plan.subtitle}</Text>
@@ -167,12 +142,7 @@ export default function PaywallPage({
                     </View>
 
                     <View style={styles.planPriceBox}>
-                      <Text
-                        style={[
-                          styles.planPrice,
-                          isActive && styles.planPriceActive,
-                        ]}
-                      >
+                      <Text style={[ styles.planPrice, isActive && styles.planPriceActive, ]} >
                         {plan.price}
                       </Text>
                     </View>
@@ -182,21 +152,14 @@ export default function PaywallPage({
             })}
 
             {/* Main action */}
-            <TouchableOpacity
-              onPress={handleConfirmPurchase}
-              style={styles.primaryButton}
-              activeOpacity={0.9}
-            >
+            <TouchableOpacity onPress={handleConfirmPurchase} style={styles.primaryButton} activeOpacity={0.9} >
               <Text style={styles.primaryButtonText}>
                 {selectedPlan.title} ile devam et
               </Text>
             </TouchableOpacity>
 
             {/* Restore */}
-            <TouchableOpacity
-              onPress={handleRestore}
-              style={styles.secondaryButton}
-            >
+            <TouchableOpacity onPress={handleRestore} style={styles.secondaryButton} >
               <Text style={styles.secondaryButtonText}>
                 Satın alımları geri yükle
               </Text>
@@ -227,7 +190,7 @@ export default function PaywallPage({
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#02130a", // deep green base
+    backgroundColor: "#02130a", 
   },
   decorLayer: {
     ...StyleSheet.absoluteFillObject,
@@ -236,7 +199,7 @@ const styles = StyleSheet.create({
   decorCircle: {
     position: "absolute",
     borderRadius: 999,
-    backgroundColor: "rgba(34,197,94,0.16)", // soft green glow
+    backgroundColor: "rgba(34,197,94,0.16)",
   },
   decorCircleLarge: {
     width: 260,
@@ -257,10 +220,10 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    paddingTop: 40,
+    paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 20,
-    backgroundColor: "rgba(0,0,0,0.45)", // glass overlay
+    backgroundColor: "rgba(0, 0, 0, 0.15)", 
   },
   scrollContent: {
     flexGrow: 1,

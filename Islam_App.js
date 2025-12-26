@@ -154,8 +154,42 @@ const BACKGROUNDS = [
 const PRAYER_MAP = { Fajr: "Sabah", Dhuhr: "Öğle", Asr: "İkindi", Maghrib: "Akşam", Isha: "Yatsı" };
 const PRAYER_NAMES = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 const defaultSettings = { soundEnabled: true, vibrationEnabled: true, darkTheme: true, notificationsEnabled: true, adsEnabled: true, };
+const REVENUECAT_IOS_API_KEY = "appl_KUTzudTEGtrGVLIlBYYvdRzInwe"
 
 export default function Islam_App() {
+  // RevenueCat implementation
+  useEffect(() => {
+    const setupRevenueCat = async () => {
+      try {
+        if (Platform.OS === "ios") {
+          await Purchases.configure({
+            apiKey: REVENUECAT_IOS_API_KEY,
+          });
+        }
+      } catch (e) {
+        console.log("RevenueCat configure ERROR:", e);
+      }
+    };
+
+    setupRevenueCat();
+  }, []);
+
+  // Load if premium
+  useEffect(() => {
+    const loadPremium = async () => {
+      try {
+        const stored = await AsyncStorage.getItem("isPremium");
+        if (stored === "true") {
+          setIsPremium(true);
+        }
+      } catch (e) {
+        console.log("loadPremium error", e);
+      }
+    };
+
+    loadPremium();
+  }, []);
+
   const [isPremium, setIsPremium] = useState(false);
   const [settings, setSettings] = useState(defaultSettings);
   const [loading, setLoading] = useState(false);
@@ -208,6 +242,109 @@ export default function Islam_App() {
 
     init();
   }, []);
+
+  // sync entitlements from RevenueCat
+  const refreshPremiumFromRevenueCat = async () => {
+    try {
+      const customerInfo = await Purchases.getCustomerInfo();
+      const hasPremium =
+        customerInfo.entitlements.active["premium_access"] != null;
+
+      setIsPremium(hasPremium);
+      await AsyncStorage.setItem("isPremium", hasPremium ? "true" : "false");
+      return hasPremium;
+    } catch (e) {
+      console.log("refreshPremiumFromRevenueCat error", e);
+      return false;
+    }
+  };
+
+  // handle purchase
+  const handlePurchase = async (productId) => {
+    try {
+      const offerings = await Purchases.getOfferings();
+      const currentOffering = offerings.current;
+
+      if (!currentOffering) {
+        Alert.alert(
+          "Hata",
+          "Satın alınabilir paket bulunamadı. Lütfen daha sonra tekrar dene."
+        );
+        return;
+      }
+
+      const availablePackages = currentOffering.availablePackages || [];
+
+      const selectedPackage = availablePackages.find(
+        (p) => p.storeProduct.identifier === productId
+      );
+
+      if (!selectedPackage) {
+        console.log(
+          "Package not found for productId:",
+          productId,
+          availablePackages
+        );
+        Alert.alert(
+          "Hata",
+          "Bu paket şu anda mevcut değil. Lütfen daha sonra tekrar dene."
+        );
+        return;
+      }
+
+      const { customerInfo } = await Purchases.purchasePackage(selectedPackage);
+
+      const hasPremium =
+        customerInfo.entitlements.active["premium_access"] != null;
+
+      if (hasPremium) {
+        await refreshPremiumFromRevenueCat();
+        Alert.alert("Teşekkürler", "Premium üyelik aktif. Allah razı olsun. 🌙");
+      } else {
+        Alert.alert(
+          "Hata",
+          "Satın alma tamamlandı gibi görünmüyor. Lütfen tekrar deneyin."
+        );
+      }
+    } catch (e) {
+      console.log("handlePurchase error:", e);
+
+      if (e.code === Purchases.PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR) {
+        return; // user canceled, no alert
+      }
+
+      Alert.alert(
+        "Hata",
+        "Satın alma tamamlanamadı. Lütfen internet bağlantını kontrol edip tekrar dene."
+      );
+    }
+  };
+
+  // handle restore
+  const handleRestore = async () => {
+    try {
+      const { customerInfo } = await Purchases.restorePurchases();
+
+      const hasPremium =
+        customerInfo.entitlements.active["premium_access"] != null;
+
+      if (hasPremium) {
+        await refreshPremiumFromRevenueCat();
+        Alert.alert("Başarılı", "Satın almaların geri yüklendi. Premium tekrar aktif.");
+      } else {
+        Alert.alert(
+          "Bilgi",
+          "Bu Apple hesabına bağlı aktif bir Premium üyelik bulunamadı."
+        );
+      }
+    } catch (e) {
+      console.log("handleRestore error:", e);
+      Alert.alert(
+        "Hata",
+        "Satın almalar geri yüklenemedi. Lütfen daha sonra tekrar dene."
+      );
+    }
+  };
 
   async function requestNotificationPermissions() {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -923,7 +1060,11 @@ export default function Islam_App() {
           PAYWALL PAGE
           ======================= */}
       {activePage === "paywall" && (
-        <PaywallPage onBack={() => setActivePage("home")} />
+        <PaywallPage 
+        onPurchase={handlePurchase}
+        onRestore={handleRestore}
+        isPremium={isPremium} 
+        onBack={() => setActivePage("home")} />
       )}
 
       {/* =======================
@@ -975,7 +1116,7 @@ export default function Islam_App() {
       {/* =======================
           BANNER AD
           ======================= */}
-      {activePage === "home" && settings.adsEnabled && BannerAd && BANNER_AD_UNIT_ID && (
+      {activePage === "home" && settings.adsEnabled && !isPremium && BannerAd && BANNER_AD_UNIT_ID && (
         <View style={styles.adContainer}>
           <BannerAd
             unitId={BANNER_AD_UNIT_ID}

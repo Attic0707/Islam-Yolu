@@ -134,7 +134,7 @@ export default function SettingsPage({ onBack, onSettingsChanged, isPremium = fa
         <TouchableOpacity style={styles.premiumBox} onPress={() => onGoPremium && onGoPremium()}>
           <Text style={styles.premiumTitle}>Reklamları Kaldır</Text>
           <Text style={styles.premiumSubtitle}>
-            Preimum sürüme geçerek ömür boyu reklamsız kullanın.
+            Premium sürüme geçerek ömür boyu reklamsız kullanın.
           </Text>
 
           <View style={styles.benefitsList}>
