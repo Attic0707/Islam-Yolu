@@ -85,7 +85,6 @@ if(!isExpoGo) {
   mobileAds = googleMobileAds.default;
   BannerAd = googleMobileAds.BannerAd;
   BannerAdSize = googleMobileAds.BannerAdSize;
-  AdEventType = googleMobileAds.AdEventType;
   TestIds = googleMobileAds.TestIds;
   
   BANNER_AD_UNIT_ID = __DEV__ ? TestIds.BANNER : Platform.select({ ios: "ca-app-pub-8919233762784771/1697907277", android: "ca-app-pub-8919233762784771/9174081776",});
@@ -156,7 +155,7 @@ const PRAYER_NAMES = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 const defaultSettings = { soundEnabled: true, vibrationEnabled: true, darkTheme: true, notificationsEnabled: true, adsEnabled: true, };
 const REVENUECAT_IOS_API_KEY = "appl_KUTzudTEGtrGVLIlBYYvdRzInwe"
 
-export default function Islam_App() {
+export default function Islam_Yolu() {
   // RevenueCat implementation
   useEffect(() => {
     const setupRevenueCat = async () => {
