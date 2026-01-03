@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { TouchableOpacity, View, Text, StyleSheet, Alert, Switch, Share, ScrollView} from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, Alert, Switch, Share, Platform, ScrollView} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -77,9 +77,12 @@ export default function SettingsPage({ onBack, onSettingsChanged, isPremium = fa
 
   async function shareTheApp() {
     try {
+    const iosLink = "https://apps.apple.com/tr/app/islam-yolu/id6755595522";
+    const androidLink = "https://play.google.com/store/apps/details?id=com.tavanarasi.islamyolu";
+    const storeLink = Platform.OS === "ios" ? iosLink : androidLink;
       await Share.share({
         message:
-          "İslam Yolu uygulamasını dene. Ezan vakitleri, Kur’an, ilham sayfası ve daha fazlası: https://apps.apple.com/tr/app/islam-yolu/id6755595522",
+          `İslam Yolu uygulamasını dene. Ezan vakitleri, Kur’an, ilham sayfası ve daha fazlası:\n${storeLink}`,
       });
     } catch (e) {
       console.log("Share error:", e);

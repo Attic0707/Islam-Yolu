@@ -1,6 +1,7 @@
-import React, { useRef } from "react";
-import { View, TouchableOpacity, Image, StyleSheet, Animated, Platform, } from "react-native";
+import React, { useMemo, useRef } from "react";
+import { View, TouchableOpacity, StyleSheet, Animated, Platform } from "react-native";
 import { BlurView } from "expo-blur";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ITEMS = [
   { key: "home", icon: require("../assets/icons/iconPack/home.png") },
@@ -12,12 +13,18 @@ const ITEMS = [
 ];
 
 export default function DockBar({ activePage, onNavigate }) {
+  const insets = useSafeAreaInsets();
+
+  const baseBottom = 16;
+
+  const bottomOffset = useMemo(() => {
+    const cushion = 6;
+    return Math.max(baseBottom, insets.bottom + cushion);
+  }, [insets.bottom]);
 
   const scaleValues = useRef({}).current;
   ITEMS.forEach((item) => {
-    if (!scaleValues[item.key]) {
-      scaleValues[item.key] = new Animated.Value(1);
-    }
+    if (!scaleValues[item.key]) scaleValues[item.key] = new Animated.Value(1);
   });
 
   function animateIcon(key) {
@@ -29,11 +36,27 @@ export default function DockBar({ activePage, onNavigate }) {
   }
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, { bottom: bottomOffset }]}>
       <BlurView intensity={50} tint="light" style={styles.dock}>
         {ITEMS.map((item) => (
-          <TouchableOpacity key={item.key} onPress={() => { animateIcon(item.key); onNavigate(item.key); }} style={styles.iconWrapper} >
-            <Animated.Image source={item.icon} style={[ styles.icon, activePage === item.key && styles.activeIcon, { transform: [{ scale: scaleValues[item.key] }] }, ]} resizeMode="contain" />
+          <TouchableOpacity
+            key={item.key}
+            onPress={() => {
+              animateIcon(item.key);
+              onNavigate(item.key);
+            }}
+            style={styles.iconWrapper}
+            activeOpacity={0.8}
+          >
+            <Animated.Image
+              source={item.icon}
+              style={[
+                styles.icon,
+                activePage === item.key && styles.activeIcon,
+                { transform: [{ scale: scaleValues[item.key] }] },
+              ]}
+              resizeMode="contain"
+            />
           </TouchableOpacity>
         ))}
       </BlurView>
@@ -44,7 +67,6 @@ export default function DockBar({ activePage, onNavigate }) {
 const styles = StyleSheet.create({
   wrapper: {
     position: "absolute",
-    bottom: 16,
     left: 0,
     right: 0,
     alignItems: "center",
@@ -60,15 +82,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: Platform.OS === "android" ? "rgba(0,0,0,0.4)" : "transparent",
   },
-  iconWrapper: {
-    padding: 8,
-  },
-  icon: {
-    width: 32,
-    height: 32,
-    opacity: 0.7,
-  },
-  activeIcon: {
-    opacity: 1,
-  },
+  iconWrapper: { padding: 8 },
+  icon: { width: 32, height: 32, opacity: 0.7 },
+  activeIcon: { opacity: 1 },
 });
