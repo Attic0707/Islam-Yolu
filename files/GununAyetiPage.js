@@ -10,6 +10,7 @@ export default function GununAyetiPage({ onBack }) {
     const [verseArabic, setVerseArabic] = useState("");
     const [verseTurkish, setVerseTurkish] = useState("");
     const [verseNameTr, setVerseNameTr] = useState("");
+    const DOCKBAR_HEIGHT = 78;
 
     useEffect(() => {
         const init = async () => {
@@ -108,40 +109,41 @@ export default function GununAyetiPage({ onBack }) {
         <TouchableOpacity onPress={onBack} style={{ alignSelf: "flex-start", marginBottom: 10 }} >
           <Text style={{ color: "#ffffff", fontSize: 25 }}>← </Text>
         </TouchableOpacity>
+            <ScrollView style={styles.scroll}
+                contentContainerStyle={[styles.scrollContent, {paddingBottom: DOCKBAR_HEIGHT + 18}]}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                bounces= {false}
+                overScrollMode = "never"
+                alwaysBounceVertical = {false}>
 
-        <Text style={styles.verseTitle}>Günün Ayeti</Text>
-        <Text style={styles.verseSubtitle}> Bugünün Ayeti </Text>
+            <Text style={styles.verseTitle}>Günün Ayeti</Text>
+            <Text style={styles.verseSubtitle}> Bugünün Ayeti </Text>
 
-        <View style={styles.verseContainer}>
-            <ScrollView style={styles.scroll}>
+            <View style={styles.verseContainer}>
                 {verseLoading ? ( <ScaledText baseSize={14} style={styles.verseLoading}> Bismillahirrahmanirrahim... </ScaledText>) : 
                 verseArabic ?  (
                     <View>
                         <ScaledText baseSize={14} style={styles.verseArabic}>{verseArabic}</ScaledText>
-
                         {verseTurkish ? ( <ScaledText baseSize={14} style={styles.verseTr}>{verseTurkish}</ScaledText> ) : null}
-
                         <ScaledText baseSize={14} style={styles.verseLabel}>{verseNameTr} Suresi</ScaledText>
-
                         {verseRef ? ( <ScaledText baseSize={14} style={styles.verseRef}>({verseRef})</ScaledText> ) : null}
                     </View> ) : (
-
                 <ScaledText baseSize={14} style={styles.verseLoading}> Ayet alınamadı. Aşağıdan tekrar deneyebilirsin. </ScaledText>
                 )}
+                <TouchableOpacity onPress={retrieveAnother} style={ styles.retrieveButton } > 
+                    <Text style={ styles.retrieveText } >
+                        Yeni Ayet Getir
+                    </Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity onPress={retrieveAnother} style={ styles.retrieveButton } > 
-                <Text style={ styles.retrieveText } >
-                    Yeni Ayet Getir
-                </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={shareVerse} style={ styles.retrieveButton } > 
-                <Text style={ styles.retrieveText } >
-                    Ayeti Paylaş
-                </Text>
-            </TouchableOpacity>
-            </ScrollView>
-          </View>
+                <TouchableOpacity onPress={shareVerse} style={ styles.retrieveButton } > 
+                    <Text style={ styles.retrieveText } >
+                        Ayeti Paylaş
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        </ScrollView>
       </View>
     );
 }
@@ -178,6 +180,7 @@ const styles = StyleSheet.create({
     scroll: {
         padding: 16,
     },
+    scrollContent: { alignItems: "stretch", },
     verseLoading: {
         fontSize: 14,
         color: "#9aa4b8",

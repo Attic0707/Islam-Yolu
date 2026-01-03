@@ -1,6 +1,6 @@
 // files/PaywallPage.js
 import React, { useState } from "react";
-import { TouchableOpacity, View, Text, StyleSheet, Linking, Alert} from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, Linking, Alert, ScrollView} from "react-native";
 import ScaledText from "./ScaledText";
 
 const PLANS = [
@@ -29,6 +29,7 @@ const PLANS = [
 ];
 
 export default function PaywallPage({ onBack, onPurchase, onRestore }) {
+  const DOCKBAR_HEIGHT = 78;
   const [selectedPlanId, setSelectedPlanId] = useState(
     "islam_yolu_premium_yearly"
   );
@@ -63,126 +64,136 @@ export default function PaywallPage({ onBack, onPurchase, onRestore }) {
 
   return (
     <View style={styles.root}>
-      <View style={styles.decorLayer}>
-        <View style={[styles.decorCircle, styles.decorCircleLarge]} />
-        <View style={[styles.decorCircle, styles.decorCircleSmall]} />
-        <Text style={[styles.decorIcon, { top: 220, left: 40 }]}>✶</Text>
-      </View>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={[styles.scrollContent, {paddingBottom: DOCKBAR_HEIGHT + 18}]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        bounces= {false}
+        overScrollMode = "never"
+        alwaysBounceVertical = {false}
+      >
+        <View style={styles.decorLayer}>
+          <View style={[styles.decorCircle, styles.decorCircleLarge]} />
+          <View style={[styles.decorCircle, styles.decorCircleSmall]} />
+          <Text style={[styles.decorIcon, { top: 220, left: 40 }]}>✶</Text>
+        </View>
 
-      <View style={styles.overlay}>
-          {/* Top section: badge + title + subtitle */}
-          <View>
-            <ScaledText baseSize={26} style={styles.title}>
-              İslam Yolu Pro
-            </ScaledText>
+        <View style={styles.overlay}>
+            {/* Top section: badge + title + subtitle */}
+            <View>
+              <ScaledText baseSize={26} style={styles.title}>
+                İslam Yolu Pro
+              </ScaledText>
 
-            <View style={styles.pill}>
-              <Text style={styles.pillText}>Reklamsız Deneyim</Text>
+              <View style={styles.pill}>
+                <Text style={styles.pillText}>Reklamsız Deneyim</Text>
+              </View>
+
+              {/* Benefits */}
+              <View style={styles.benefitsBox}>
+                <Text style={styles.benefitsTitle}>Pro ile neler açılır?</Text>
+
+                <View style={styles.benefitRow}>
+                  <Text style={styles.benefitIcon}>☑</Text>
+                  <Text style={styles.benefitText}>
+                    Tüm reklamlar kaldırılır.
+                  </Text>
+                </View>
+
+                <View style={styles.benefitRow}>
+                  <Text style={styles.benefitIcon}>☑</Text>
+                  <Text style={styles.benefitText}>
+                    Yeni özelliklerin daha hızlı gelmesine vesile olursun.
+                  </Text>
+                </View>
+
+                <View style={styles.benefitRow}>
+                  <Text style={styles.benefitIcon}>☑</Text>
+                  <Text style={styles.benefitText}>
+                    Uygulamayı geliştirmemize destek olarak daha fazla müslümana ulaşmamıza yardımcı olursun.
+                  </Text>
+                </View>
+              </View>
             </View>
 
-            {/* Benefits */}
-            <View style={styles.benefitsBox}>
-              <Text style={styles.benefitsTitle}>Pro ile neler açılır?</Text>
+            {/* Bottom section: stacked offers + CTA */}
+            <View style={styles.bottomSection}>
+              {/* Stacked plan cards */}
+              {PLANS.map((plan) => {
+                const isActive = plan.id === selectedPlanId;
+                return (
+                  <TouchableOpacity
+                    key={plan.id}
+                    onPress={() => setSelectedPlanId(plan.id)}
+                    activeOpacity={0.9}
+                    style={[
+                      styles.planCard,
+                      isActive && styles.planCardActive,
+                    ]} >
+                    {/* Badge */}
+                    {plan.recommended && (
+                      <View style={styles.recommendedBadge}>
+                        <Text style={styles.recommendedBadgeText}>
+                          En çok tercih edilen
+                        </Text>
+                      </View>
+                    )}
 
-              <View style={styles.benefitRow}>
-                <Text style={styles.benefitIcon}>☑</Text>
-                <Text style={styles.benefitText}>
-                  Tüm reklamlar kaldırılır.
-                </Text>
-              </View>
+                    <View style={styles.planRow}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[ styles.planTitle, isActive && styles.planTitleActive, ]} >
+                          {plan.title}
+                        </Text>
+                        <Text style={styles.planSubtitle}>{plan.subtitle}</Text>
+                        {plan.tag ? (
+                          <Text style={styles.planTag}>{plan.tag}</Text>
+                        ) : null}
+                      </View>
 
-              <View style={styles.benefitRow}>
-                <Text style={styles.benefitIcon}>☑</Text>
-                <Text style={styles.benefitText}>
-                  Yeni özelliklerin daha hızlı gelmesine vesile olursun.
-                </Text>
-              </View>
-
-              <View style={styles.benefitRow}>
-                <Text style={styles.benefitIcon}>☑</Text>
-                <Text style={styles.benefitText}>
-                  Uygulamayı geliştirmemize destek olarak daha fazla müslümana ulaşmamıza yardımcı olursun.
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {/* Bottom section: stacked offers + CTA */}
-          <View style={styles.bottomSection}>
-            {/* Stacked plan cards */}
-            {PLANS.map((plan) => {
-              const isActive = plan.id === selectedPlanId;
-              return (
-                <TouchableOpacity
-                  key={plan.id}
-                  onPress={() => setSelectedPlanId(plan.id)}
-                  activeOpacity={0.9}
-                  style={[
-                    styles.planCard,
-                    isActive && styles.planCardActive,
-                  ]} >
-                  {/* Badge */}
-                  {plan.recommended && (
-                    <View style={styles.recommendedBadge}>
-                      <Text style={styles.recommendedBadgeText}>
-                        En çok tercih edilen
-                      </Text>
+                      <View style={styles.planPriceBox}>
+                        <Text style={[ styles.planPrice, isActive && styles.planPriceActive, ]} >
+                          {plan.price}
+                        </Text>
+                      </View>
                     </View>
-                  )}
+                  </TouchableOpacity>
+                );
+              })}
 
-                  <View style={styles.planRow}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={[ styles.planTitle, isActive && styles.planTitleActive, ]} >
-                        {plan.title}
-                      </Text>
-                      <Text style={styles.planSubtitle}>{plan.subtitle}</Text>
-                      {plan.tag ? (
-                        <Text style={styles.planTag}>{plan.tag}</Text>
-                      ) : null}
-                    </View>
+              {/* Main action */}
+              <TouchableOpacity onPress={handleConfirmPurchase} style={styles.primaryButton} activeOpacity={0.9} >
+                <Text style={styles.primaryButtonText}>
+                  {selectedPlan.title} ile devam et
+                </Text>
+              </TouchableOpacity>
 
-                    <View style={styles.planPriceBox}>
-                      <Text style={[ styles.planPrice, isActive && styles.planPriceActive, ]} >
-                        {plan.price}
-                      </Text>
-                    </View>
-                  </View>
+              {/* Restore */}
+              <TouchableOpacity onPress={handleRestore} style={styles.secondaryButton} >
+                <Text style={styles.secondaryButtonText}>
+                  Satın alımları geri yükle
+                </Text>
+              </TouchableOpacity>
+
+              {/* Legal */}
+              <View style={styles.legalRow}>
+                <TouchableOpacity onPress={openTerms}>
+                  <Text style={styles.legalLink}>Kullanım Koşulları</Text>
                 </TouchableOpacity>
-              );
-            })}
+                <Text style={{ color: "#64748b", marginHorizontal: 4 }}>•</Text>
+                <TouchableOpacity onPress={openPrivacy}>
+                  <Text style={styles.legalLink}>Gizlilik Politikası</Text>
+                </TouchableOpacity>
+              </View>
 
-            {/* Main action */}
-            <TouchableOpacity onPress={handleConfirmPurchase} style={styles.primaryButton} activeOpacity={0.9} >
-              <Text style={styles.primaryButtonText}>
-                {selectedPlan.title} ile devam et
+              <Text style={styles.legalNote}>
+                Ödemeler Apple hesabın üzerinden tahsil edilir. Fiyatlar bölgeye
+                göre değişiklik gösterebilir. Abonelik planları, dönem sonunda
+                otomatik yenilenir ve Ayarlar üzerinden iptal edilebilir.
               </Text>
-            </TouchableOpacity>
-
-            {/* Restore */}
-            <TouchableOpacity onPress={handleRestore} style={styles.secondaryButton} >
-              <Text style={styles.secondaryButtonText}>
-                Satın alımları geri yükle
-              </Text>
-            </TouchableOpacity>
-
-            {/* Legal */}
-            <View style={styles.legalRow}>
-              <TouchableOpacity onPress={openTerms}>
-                <Text style={styles.legalLink}>Kullanım Koşulları</Text>
-              </TouchableOpacity>
-              <Text style={{ color: "#64748b", marginHorizontal: 4 }}>•</Text>
-              <TouchableOpacity onPress={openPrivacy}>
-                <Text style={styles.legalLink}>Gizlilik Politikası</Text>
-              </TouchableOpacity>
             </View>
-
-            <Text style={styles.legalNote}>
-              Ödemeler Apple hesabın üzerinden tahsil edilir. Fiyatlar bölgeye
-              göre değişiklik gösterebilir. Abonelik planları, dönem sonunda
-              otomatik yenilenir ve Ayarlar üzerinden iptal edilebilir.
-            </Text>
-          </View>
-      </View>
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -220,16 +231,13 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    paddingTop: 60,
+    paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.15)", 
+    backgroundColor: "rgba(0, 0, 0, 0)", 
   },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: "space-between",
-    paddingBottom: 16,
-  },
+  scroll: { flex: 1 },
+  scrollContent: { alignItems: "stretch", },
   pill: {
     alignSelf: "center",
     paddingHorizontal: 14,

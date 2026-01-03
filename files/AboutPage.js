@@ -131,7 +131,7 @@ export default function AboutPage({ onBack }) {
 
           {/* Version info */}
           <ScaledText baseSize={12} style={{ color: "#aaa", marginTop: 25, textAlign: "center", }} >
-            Sürüm: 1.1.19{"\n"}© 2025 - Tüm hakları saklıdır.
+            Sürüm: 1.2.13{"\n"}© 2025 - Tüm hakları saklıdır.
           </ScaledText>
         </View>
 
