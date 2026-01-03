@@ -1,22 +1,42 @@
-import React, { useEffect, useState, useRef } from "react";
-import { TouchableOpacity, View, Text, StyleSheet, ScrollView, ActivityIndicator, Animated, } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { TouchableOpacity, View, Text, StyleSheet, Dimensions, ActivityIndicator, Animated, } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";
 
 const PRAYER_ORDER = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 const PRAYER_LABELS = { Fajr: "Sabah", Dhuhr: "Öğle", Asr: "İkindi", Maghrib: "Akşam", Isha: "Yatsı",};
 
 export default function NamazTakipPage({ onBack }) {
+  const { height: H } = Dimensions.get("window");
+
+  const isVeryShort = H <= 600;
+  const isShort = H <= 700;
+
+  // small-screen tuning
+  const PAD_X = isVeryShort ? 12 : 14;
+  const GAP = isVeryShort ? 8 : 10;
+
+  const headerPad = isVeryShort ? 10 : 12;
+  const headerTitleSize = isVeryShort ? 16 : 18;
+  const metaSize = isVeryShort ? 12 : 13;
+
+  const circleSize = isVeryShort ? 64 : 72;
+  const circleBorderRadius = circleSize / 2;
+  const progressMainSize = isVeryShort ? 16 : 18;
+
+  const progressScale = useRef(new Animated.Value(1)).current;
+
   const [loading, setLoading] = useState(true);
   const [coords, setCoords] = useState(null);
 
-  const [dateOffset, setDateOffset] = useState(0); // 0 = today, -1 = yesterday, etc.
+  const [dateOffset, setDateOffset] = useState(0);
   const [now, setNow] = useState(new Date());
 
   const [gregorianText, setGregorianText] = useState("");
   const [hijriText, setHijriText] = useState("");
   const [locationText, setLocationText] = useState("");
 
-  const [prayers, setPrayers] = useState([]); // [{key, label, timeString, hour, minute}]
+  const [prayers, setPrayers] = useState([]);
   const [errorMsg, setErrorMsg] = useState("");
 
   const [checkedPrayers, setCheckedPrayers] = useState({
@@ -27,13 +47,9 @@ export default function NamazTakipPage({ onBack }) {
     Isha: false,
   });
 
-  const progressScale = useRef(new Animated.Value(1)).current;
-
-  // keep "now" ticking to update countdown (every 30s is enough)
+  // keep "now" ticking
   useEffect(() => {
-    const id = setInterval(() => {
-      setNow(new Date());
-    }, 30 * 1000);
+    const id = setInterval(() => setNow(new Date()), 30 * 1000);
     return () => clearInterval(id);
   }, []);
 
@@ -43,8 +59,7 @@ export default function NamazTakipPage({ onBack }) {
 
     async function initLocation() {
       try {
-        const { status } =
-          await Location.requestForegroundPermissionsAsync();
+        const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
           setErrorMsg(
             "Konum izni verilmedi. Namaz vakitlerini gösterebilmek için konum izni gereklidir."
@@ -66,9 +81,7 @@ export default function NamazTakipPage({ onBack }) {
           const g = geo[0];
           const city = g.city || g.subregion || g.region || "";
           const country = g.country || "";
-          setLocationText(
-            [city, country].filter(Boolean).join(", ")
-          );
+          setLocationText([city, country].filter(Boolean).join(", "));
         }
       } catch (e) {
         setErrorMsg("Konum alınırken bir hata oluştu.");
@@ -82,10 +95,10 @@ export default function NamazTakipPage({ onBack }) {
     };
   }, []);
 
-  // fetch data whenever coords or dateOffset changes
   useEffect(() => {
     if (!coords) return;
     loadPrayerDataForOffset(dateOffset);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coords, dateOffset]);
 
   async function loadPrayerDataForOffset(offsetDays) {
@@ -117,7 +130,6 @@ export default function NamazTakipPage({ onBack }) {
         return;
       }
 
-      // header dates
       const hijri = json.data?.date?.hijri;
       const greg = json.data?.date?.gregorian;
 
@@ -144,12 +156,11 @@ export default function NamazTakipPage({ onBack }) {
         setHijriText("");
       }
 
-      // timings -> prayers array
       const timings = json.data.timings;
       const parsed = PRAYER_ORDER.map((key) => {
         const raw = timings[key];
         if (!raw) return null;
-        const timePart = raw.split(" ")[0]; // e.g. "06:25 (BST)" -> "06:25"
+        const timePart = raw.split(" ")[0];
         const [hStr, mStr] = timePart.split(":");
         const hour = parseInt(hStr, 10);
         const minute = parseInt(mStr, 10);
@@ -166,7 +177,6 @@ export default function NamazTakipPage({ onBack }) {
 
       setPrayers(parsed);
 
-      // reset checklist when day changes
       setCheckedPrayers({
         Fajr: false,
         Dhuhr: false,
@@ -184,7 +194,7 @@ export default function NamazTakipPage({ onBack }) {
 
   function getNextPrayerInfo() {
     if (prayers.length === 0) return null;
-    if (dateOffset !== 0) return null; // countdown only for *today*
+    if (dateOffset !== 0) return null;
 
     const nowDate = now;
     let next = null;
@@ -222,12 +232,15 @@ export default function NamazTakipPage({ onBack }) {
     }));
   }
 
-  const completedCount = PRAYER_ORDER.reduce(
-    (acc, key) => (checkedPrayers[key] ? acc + 1 : acc),
-    0
+  const completedCount = useMemo(
+    () =>
+      PRAYER_ORDER.reduce(
+        (acc, key) => (checkedPrayers[key] ? acc + 1 : acc),
+        0
+      ),
+    [checkedPrayers]
   );
 
-  // animate progress circle on completedCount change
   useEffect(() => {
     Animated.sequence([
       Animated.timing(progressScale, {
@@ -245,122 +258,287 @@ export default function NamazTakipPage({ onBack }) {
 
   const nextInfo = getNextPrayerInfo();
 
+  if (isShort || isVeryShort) {
+    return (
+      <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
+        <View style={[styles.container, { paddingHorizontal: PAD_X }]}>
+          {/* HEADER */}
+          <View style={[styles.card, { padding: headerPad, marginBottom: GAP }]}>
+            <View style={styles.headerCompactRow}>
+              {/* LEFT */}
+              <View style={{ flex: 1, paddingRight: 10 }}>
+                <Text
+                  style={[styles.headerTitle, { fontSize: headerTitleSize }]}
+                  numberOfLines={1}
+                >
+                  Bugünün Namazları
+                </Text>
+
+                {!!gregorianText && (
+                  <Text
+                    style={[styles.gregorianText, { fontSize: metaSize }]}
+                    numberOfLines={1}
+                  >
+                    {gregorianText}
+                  </Text>
+                )}
+                {!!hijriText && (
+                  <Text
+                    style={[styles.hijriText, { fontSize: metaSize - 1 }]}
+                    numberOfLines={1}
+                  >
+                    {hijriText}
+                  </Text>
+                )}
+                {!!locationText && (
+                  <Text
+                    style={[styles.locationText, { fontSize: metaSize - 2 }]}
+                    numberOfLines={1}
+                  >
+                    {locationText}
+                  </Text>
+                )}
+
+                <View style={{ marginTop: 8 }}>
+                  <Text style={[styles.sectionLabel, { marginBottom: 2 }]}>
+                    Sıradaki vakit
+                  </Text>
+
+                  {loading ? (
+                    <Text
+                      style={[styles.nextPrayerFallback, { fontSize: 12 }]}
+                      numberOfLines={1}
+                    >
+                      Yükleniyor...
+                    </Text>
+                  ) : nextInfo ? (
+                    <Text style={[styles.nextInline, { fontSize: 12 }]} numberOfLines={2}>
+                      <Text style={{ fontWeight: "700", color: "#ffffff" }}>
+                        {nextInfo.label}
+                      </Text>
+                      <Text style={{ color: "#ffdd55" }}>  {nextInfo.timeString}</Text>
+                      <Text style={{ color: "#d0d7e2" }}>
+                        {"  "}(
+                        {nextInfo.hours > 0 ? `${nextInfo.hours}s ` : ""}
+                        {nextInfo.minutes}dk)
+                      </Text>
+                    </Text>
+                  ) : (
+                    <Text
+                      style={[styles.nextPrayerFallback, { fontSize: 12 }]}
+                      numberOfLines={2}
+                    >
+                      Bugün için sonraki vakit bulunamadı.
+                    </Text>
+                  )}
+                </View>
+              </View>
+
+              {/* RIGHT  */}
+              <View style={styles.progressRightCol}>
+                <Animated.View
+                  style={[
+                    styles.progressCircle,
+                    {
+                      width: circleSize,
+                      height: circleSize,
+                      borderRadius: circleBorderRadius,
+                      transform: [{ scale: progressScale }],
+                    },
+                  ]}
+                >
+                  <Text style={[styles.progressMainText, { fontSize: progressMainSize }]}>
+                    {completedCount}/5
+                  </Text>
+                  <Text style={styles.progressSubText}>kılındı</Text>
+                </Animated.View>
+
+                {completedCount === 5 ? (
+                  <Text style={styles.progressCompletedText} numberOfLines={1}>
+                    🌙
+                  </Text>
+                ) : (
+                  <Text style={styles.progressHintText} numberOfLines={2}>
+                    Bugün
+                  </Text>
+                )}
+              </View>
+            </View>
+          </View>
+
+          {/* CHECKLIST (cannot overflow) */}
+          <View style={[styles.card, styles.checklistCard]}>
+            <Text style={styles.checklistTitle} numberOfLines={1}>
+              Namaz Listesi
+            </Text>
+
+            {loading && prayers.length === 0 ? (
+              <View style={styles.loadingWrap}>
+                <ActivityIndicator color="#fff" />
+                <Text style={styles.loadingText}>Yükleniyor...</Text>
+              </View>
+            ) : errorMsg ? (
+              <Text style={styles.errorText}>{errorMsg}</Text>
+            ) : (
+              <View style={styles.checklistRowsWrap}>
+                {prayers.map((p, idx) => {
+                  const checked = checkedPrayers[p.key];
+                  const isLast = idx === prayers.length - 1;
+
+                  return (
+                    <TouchableOpacity
+                      key={p.key}
+                      style={[styles.checkRow, isLast && { borderBottomWidth: 0 }]}
+                      onPress={() => togglePrayer(p.key)}
+                      activeOpacity={0.7}
+                    >
+                      <View style={[styles.checkboxOuter, checked && styles.checkboxOuterChecked]}>
+                        {checked && <View style={styles.checkboxInner} />}
+                      </View>
+
+                      <View style={styles.checkTextCol}>
+                        <Text style={styles.checkPrayerName} numberOfLines={1}>
+                          {p.label}
+                        </Text>
+                        <Text style={styles.checkPrayerTime} numberOfLines={1}>
+                          {p.timeString}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            )}
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <View >
+    <View style={stylesRegular.overlay}>
       {/* HEADER */}
-      <View style={styles.headerCard}>
-        <View style={styles.headerTopRow}>
-          <Text style={styles.headerTitle}>Bugünün Namazları</Text>
+      <View style={stylesRegular.headerCard}>
+        <View style={stylesRegular.headerTopRow}>
+          <Text style={stylesRegular.headerTitle}>Bugünün Namazları</Text>
         </View>
 
-        <View style={styles.headerDateBlock}>
+        <View style={stylesRegular.headerDateBlock}>
           {gregorianText ? (
-            <Text style={styles.gregorianText}>{gregorianText}</Text>
+            <Text style={stylesRegular.gregorianText}>{gregorianText}</Text>
           ) : null}
           {hijriText ? (
-            <Text style={styles.hijriText}>{hijriText}</Text>
+            <Text style={stylesRegular.hijriText}>{hijriText}</Text>
           ) : null}
           {locationText ? (
-            <Text style={styles.locationText}>{locationText}</Text>
+            <Text style={stylesRegular.locationText}>{locationText}</Text>
           ) : null}
         </View>
 
-        <View style={styles.headerNavRow}>
-          <TouchableOpacity style={styles.navBtn} onPress={() => setDateOffset((d) => d - 1)} >
-            <Text style={styles.navBtnText}>← Önceki gün</Text>
+        <View style={stylesRegular.headerNavRow}>
+          <TouchableOpacity
+            style={stylesRegular.navBtn}
+            onPress={() => setDateOffset((d) => d - 1)}
+          >
+            <Text style={stylesRegular.navBtnText}>← Önceki gün</Text>
           </TouchableOpacity>
 
-          <Text style={styles.navCenterText}>
+          <Text style={stylesRegular.navCenterText}>
             {dateOffset === 0 ? "Bugün" : null}
           </Text>
 
-          <TouchableOpacity style={[ styles.navBtn, dateOffset === 0 && { opacity: 0.4 }, ]} disabled={dateOffset === 0} onPress={() => setDateOffset((d) => Math.min(0, d + 1))} >
-            <Text style={styles.navBtnText}>Sonraki gün →</Text>
+          <TouchableOpacity
+            style={[
+              stylesRegular.navBtn,
+              dateOffset === 0 && { opacity: 0.4 },
+            ]}
+            disabled={dateOffset === 0}
+            onPress={() => setDateOffset((d) => Math.min(0, d + 1))}
+          >
+            <Text style={stylesRegular.navBtnText}>Sonraki gün →</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* TOP ROW: Next prayer + circular progress */}
-      <View style={styles.topRow}>
-        {/* TOP LEFT: Next prayer */}
-        <View style={styles.nextCard}>
-          <Text style={styles.sectionLabel}>Sıradaki vakit</Text>
+      <View style={stylesRegular.topRow}>
+        <View style={stylesRegular.nextCard}>
+          <Text style={stylesRegular.sectionLabel}>Sıradaki vakit</Text>
 
           {loading ? (
             <ActivityIndicator color="#fff" style={{ marginTop: 8 }} />
           ) : nextInfo ? (
             <>
-              <Text style={styles.nextPrayerName}>{nextInfo.label}</Text>
-              <Text style={styles.nextPrayerTime}>
+              <Text style={stylesRegular.nextPrayerName}>{nextInfo.label}</Text>
+              <Text style={stylesRegular.nextPrayerTime}>
                 {nextInfo.timeString}
               </Text>
-              <Text style={styles.nextPrayerCountdown}>
-                {nextInfo.hours > 0
-                  ? `${nextInfo.hours} s `
-                  : ""}
+              <Text style={stylesRegular.nextPrayerCountdown}>
+                {nextInfo.hours > 0 ? `${nextInfo.hours} s ` : ""}
                 {nextInfo.minutes} dk kaldı
               </Text>
             </>
           ) : (
-            <Text style={styles.nextPrayerFallback}>
+            <Text style={stylesRegular.nextPrayerFallback}>
               Bugün için sonraki vakit bulunamadı.
             </Text>
           )}
         </View>
 
-        {/* TOP RIGHT: Progress circle */}
-        <View style={styles.progressCard}>
-          <Text style={styles.sectionLabel}>Günlük hedef</Text>
+        <View style={stylesRegular.progressCard}>
+          <Text style={stylesRegular.sectionLabel}>Günlük hedef</Text>
 
           <Animated.View
             style={[
-              styles.progressCircle,
+              stylesRegular.progressCircle,
               { transform: [{ scale: progressScale }] },
             ]}
           >
-            <Text style={styles.progressMainText}>
-              {completedCount}/5
-            </Text>
-            <Text style={styles.progressSubText}>kılındı</Text>
+            <Text style={stylesRegular.progressMainText}>{completedCount}/5</Text>
+            <Text style={stylesRegular.progressSubText}>kılındı</Text>
           </Animated.View>
 
           {completedCount === 5 ? (
-            <Text style={styles.progressCompletedText}>
-              Maşallah! 🌙
-            </Text>
+            <Text style={stylesRegular.progressCompletedText}>Maşallah! 🌙</Text>
           ) : (
-            <Text style={styles.progressHintText}>
+            <Text style={stylesRegular.progressHintText}>
               Bugün kılınan farz namaz sayısı.
             </Text>
           )}
         </View>
       </View>
 
-      {/* CENTER: checklist */}
-      <View style={styles.checklistCard}>
-        <Text style={styles.checklistTitle}>Namaz Listesi</Text>
+      <View style={stylesRegular.checklistCard}>
+        <Text style={stylesRegular.checklistTitle}>Namaz Listesi</Text>
 
         {loading && prayers.length === 0 ? (
           <View style={{ paddingVertical: 20 }}>
             <ActivityIndicator color="#fff" />
-            <Text style={styles.loadingText}>Yükleniyor...</Text>
+            <Text style={stylesRegular.loadingText}>Yükleniyor...</Text>
           </View>
         ) : errorMsg ? (
-          <Text style={styles.errorText}>{errorMsg}</Text>
+          <Text style={stylesRegular.errorText}>{errorMsg}</Text>
         ) : (
           <View>
             {prayers.map((p) => {
               const checked = checkedPrayers[p.key];
               return (
-                <TouchableOpacity key={p.key} style={styles.checkRow} onPress={() => togglePrayer(p.key)} activeOpacity={0.7} >
-                    <View style={[ styles.checkboxOuter, checked && styles.checkboxOuterChecked, ]}  >
-                    {checked && <View style={styles.checkboxInner} />}
+                <TouchableOpacity
+                  key={p.key}
+                  style={stylesRegular.checkRow}
+                  onPress={() => togglePrayer(p.key)}
+                  activeOpacity={0.7}
+                >
+                  <View
+                    style={[
+                      stylesRegular.checkboxOuter,
+                      checked && stylesRegular.checkboxOuterChecked,
+                    ]}
+                  >
+                    {checked && <View style={stylesRegular.checkboxInner} />}
                   </View>
-                  <View style={styles.checkTextCol}>
-                    <Text style={styles.checkPrayerName}>{p.label}</Text>
-                    <Text style={styles.checkPrayerTime}>
-                      {p.timeString}
-                    </Text>
+                  <View style={stylesRegular.checkTextCol}>
+                    <Text style={stylesRegular.checkPrayerName}>{p.label}</Text>
+                    <Text style={stylesRegular.checkPrayerTime}>{p.timeString}</Text>
                   </View>
                 </TouchableOpacity>
               );
@@ -372,11 +550,10 @@ export default function NamazTakipPage({ onBack }) {
   );
 }
 
-// ---- STYLES ----
-const styles = StyleSheet.create({
+const stylesRegular = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0)",
     paddingHorizontal: 20,
     paddingTop: 40,
     paddingBottom: 20,
@@ -385,7 +562,6 @@ const styles = StyleSheet.create({
   },
 
   headerCard: {
-    // backgroundColor: "rgba(0,0,0,0.65)",
     backgroundColor: "rgba(0, 0, 0, 0.39)",
     borderRadius: 14,
     padding: 14,
@@ -595,4 +771,102 @@ const styles = StyleSheet.create({
     color: "#d0d7e2",
     marginTop: 2,
   },
+});
+
+const styles = StyleSheet.create({
+  safe: { flex: 1 },
+
+  container: {
+    flex: 1,
+    backgroundColor: "transparent",
+    paddingTop: 8,
+    paddingBottom: 8,
+  },
+
+  card: {
+    backgroundColor: "rgba(0, 0, 0, 0.39)",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+  },
+
+  headerTitle: { fontWeight: "700", color: "#ffffff" },
+  gregorianText: { color: "#ffffff", marginTop: 6 },
+  hijriText: { color: "#d0d7e2", marginTop: 2 },
+  locationText: { color: "#aab4c8", marginTop: 2 },
+
+  headerCompactRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+
+  sectionLabel: { fontSize: 12, color: "#aab4c8", marginBottom: 4 },
+
+  nextInline: { color: "#d0d7e2" },
+  nextPrayerFallback: { color: "#aab4c8", marginTop: 6 },
+
+  progressRightCol: {
+    alignItems: "center",
+  },
+
+  progressCircle: {
+    borderWidth: 3,
+    borderColor: "#ffdd55",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(255,221,85,0.08)",
+    marginVertical: 6,
+  },
+  progressMainText: { fontWeight: "700", color: "#ffffff" },
+  progressSubText: { fontSize: 12, color: "#d0d7e2" },
+  progressCompletedText: { fontSize: 12, color: "#9df0a8", textAlign: "center" },
+  progressHintText: { fontSize: 11, color: "#aab4c8", textAlign: "center" },
+
+  checklistCard: {
+    flex: 1, 
+    paddingTop: 12,
+    paddingHorizontal: 12,
+    paddingBottom: 10,
+  },
+  checklistTitle: { fontWeight: "700", color: "#ffffff", marginBottom: 6 },
+
+  loadingWrap: { paddingVertical: 14 },
+  loadingText: { marginTop: 8, fontSize: 13, color: "#d0d7e2", textAlign: "center" },
+  errorText: { fontSize: 13, color: "#ffb3b3", textAlign: "center", marginTop: 8 },
+
+  checklistRowsWrap: {
+    flex: 1,
+    minHeight: 0,
+  },
+
+  checkRow: {
+    flex: 1,
+    minHeight: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.06)",
+    paddingVertical: 0,
+  },
+
+  checkboxOuter: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  checkboxOuterChecked: { borderColor: "#9df0a8", backgroundColor: "rgba(157,240,168,0.15)" },
+  checkboxInner: { width: 10, height: 10, borderRadius: 3, backgroundColor: "#9df0a8" },
+
+  checkTextCol: {
+    flex: 1,
+    minWidth: 0,
+  },
+
+  checkPrayerName: { color: "#ffffff", fontWeight: "600", fontSize: 14 },
+  checkPrayerTime: { color: "#d0d7e2", marginTop: 2, fontSize: 12 },
 });

@@ -716,7 +716,6 @@ export default function Islam_Yolu() {
           ======================= */}
       {activePage === "home" && (
         <View style={styles.overlay}>
-          {/* Top bar with menu + title */}
           <NamazTakipPage onBack={() => setActivePage("home")} />
         </View>
       )}
@@ -1145,7 +1144,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     paddingRight: 15,
     paddingLeft: 20,
-    paddingTop: 40,
     paddingBottom: 90,
     alignItems: "stretch",
     justifyContent: "flex-start",

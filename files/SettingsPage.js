@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { TouchableOpacity, View, Text, StyleSheet, Alert, Switch, Share, } from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, Alert, Switch, Share, ScrollView} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SettingsPage({ onBack, onSettingsChanged, isPremium = false, onGoPremium, }) {
@@ -10,6 +11,7 @@ export default function SettingsPage({ onBack, onSettingsChanged, isPremium = fa
   const [darkTheme, setDarkTheme] = useState(true);
   const [adsEnabled, setAdsEnabled] = useState(true);
   const [cooldown, setCooldown] = useState(false);
+  const DOCKBAR_HEIGHT = 78;
 
   useEffect(() => {
     const load = async () => {
@@ -41,9 +43,7 @@ export default function SettingsPage({ onBack, onSettingsChanged, isPremium = fa
       adsEnabled,
     };
 
-    if (onSettingsChanged) {
-      onSettingsChanged(data);
-    }
+    if (onSettingsChanged) onSettingsChanged(data);
 
     try {
       await AsyncStorage.setItem("settings", JSON.stringify(data));
@@ -87,84 +87,115 @@ export default function SettingsPage({ onBack, onSettingsChanged, isPremium = fa
   }
 
   return (
-    <View style={[ styles.overlay, { justifyContent: "flex-start", paddingTop: 60, paddingHorizontal: 20 }, ]}  >
-      <TouchableOpacity onPress={onBack} style={{ alignSelf: "flex-start", marginBottom: 10 }} >
-        <Text style={{ color: "#ffffff", fontSize: 18 }}>← </Text>
-      </TouchableOpacity>
+    <SafeAreaView style={styles.safe} edges={["top", "left", "right"]}>
+      <View style={styles.overlay}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={[styles.scrollContent, {paddingBottom: DOCKBAR_HEIGHT + 18}]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          bounces= {false}
+          overScrollMode = "never"
+          alwaysBounceVertical = {false}
+        >
+          <TouchableOpacity
+            onPress={onBack}
+            style={{ alignSelf: "flex-start", marginBottom: 10 }}
+          >
+            <Text style={{ color: "#ffffff", fontSize: 18 }}>← </Text>
+          </TouchableOpacity>
 
-      <Text style={styles.settingsTitle}>Ayarlar</Text>
+          <Text style={styles.settingsTitle}>Ayarlar</Text>
 
-      <View style={styles.settingRow}>
-        <Text style={styles.settingLabel}>Bildirim sesi</Text>
-        <Switch value={soundEnabled} onValueChange={setSoundEnabled} />
-      </View>
-
-      <View style={styles.settingRow}>
-        <Text style={styles.settingLabel}>Titreşim</Text>
-        <Switch value={vibrationEnabled} onValueChange={setVibrationEnabled} />
-      </View>
-
-      <View style={styles.settingRow}>
-        <Text style={styles.settingLabel}>Ezan Bildirimleri</Text>
-        <Switch
-          value={notificationsEnabled}
-          onValueChange={setNotificationsEnabled}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.settingRow} onPress={triggerBackgroundChange} disabled={cooldown}>
-        <Text style={[styles.settingLabel, cooldown && { opacity: 0.5 }]}  >
-          Arka Plan Değiştir
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.settingRow} onPress={shareTheApp} disabled={cooldown}>
-        <Text style={[styles.settingLabel, cooldown && { opacity: 0.5 }]}  >
-          İslam Yolu'nu Paylaş
-        </Text>
-      </TouchableOpacity>
-
-      {/* ==== Premium / Ads section ==== */}
-      {isPremium ? (
-        <View style={[styles.premiumActiveBox]}>
-          <Text style={[styles.premiumActiveTitle]}>🌟 Premium Aktif</Text>
-          <Text style={styles.premiumActiveSubtitle}>Reklamlar kaldırıldı - Allah razı olsun </Text>
-        </View>
-      ) : (
-        <TouchableOpacity style={styles.premiumBox} onPress={() => onGoPremium && onGoPremium()}>
-          <Text style={styles.premiumTitle}>Reklamları Kaldır</Text>
-          <Text style={styles.premiumSubtitle}>
-            Premium sürüme geçerek ömür boyu reklamsız kullanın.
-          </Text>
-
-          <View style={styles.benefitsList}>
-            <Text style={styles.benefitLine}> Tüm reklamlar kaldırılır</Text>
-            <Text style={styles.benefitLine}> Uygulamanın gelişimine destek olun 💛</Text>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Bildirim sesi</Text>
+            <Switch value={soundEnabled} onValueChange={setSoundEnabled} />
           </View>
 
-          <View style={styles.premiumButton}>
-            <Text style={styles.premiumButtonText}>Premium’a Geç</Text>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Titreşim</Text>
+            <Switch value={vibrationEnabled} onValueChange={setVibrationEnabled} />
           </View>
-        </TouchableOpacity>
-      )}
 
-      <TouchableOpacity onPress={save} style={styles.settingsSaveBtn}>
-        <Text style={styles.settingsSaveText}>Kaydet</Text>
-      </TouchableOpacity>
-    </View>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Ezan Bildirimleri</Text>
+            <Switch value={notificationsEnabled} onValueChange={setNotificationsEnabled} />
+          </View>
+
+          <TouchableOpacity
+            style={styles.settingRow}
+            onPress={triggerBackgroundChange}
+            disabled={cooldown}
+            activeOpacity={0.75}
+          >
+            <Text style={[styles.settingLabel, cooldown && { opacity: 0.5 }]}>
+              Arka Plan Değiştir
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.settingRow}
+            onPress={shareTheApp}
+            disabled={cooldown}
+            activeOpacity={0.75}
+          >
+            <Text style={[styles.settingLabel, cooldown && { opacity: 0.5 }]}>
+              İslam Yolu'nu Paylaş
+            </Text>
+          </TouchableOpacity>
+
+          {/* ==== Premium / Ads section ==== */}
+          {isPremium ? (
+            <View style={styles.premiumActiveBox}>
+              <Text style={styles.premiumActiveTitle}>🌟 Premium Aktif</Text>
+              <Text style={styles.premiumActiveSubtitle}>
+                Reklamlar kaldırıldı - Allah razı olsun
+              </Text>
+            </View>
+          ) : (
+            
+            <View style={styles.premiumBox} activeOpacity={0.85}>
+              <Text style={styles.premiumTitle}>Reklamları Kaldır</Text>
+              <Text style={styles.premiumSubtitle}>
+                Premium sürüme geçerek ömür boyu reklamsız kullanın.
+              </Text>
+
+              <View style={styles.benefitsList}>
+                <Text style={styles.benefitLine}>Tüm reklamlar kaldırılır</Text>
+                <Text style={styles.benefitLine}>Uygulamanın gelişimine destek olun 💛</Text>
+              </View>
+
+              <TouchableOpacity style={styles.premiumButton} onPress={() => onGoPremium && onGoPremium()} activeOpacity={0.85} >
+                <Text style={styles.premiumButtonText}>Premium’a Geç</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          <TouchableOpacity onPress={save} style={styles.settingsSaveBtn} activeOpacity={0.85}>
+            <Text style={styles.settingsSaveText}>Kaydet</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safe: { flex: 1 },
+
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 20,
-    alignItems: "stretch",
-    justifyContent: "flex-start",
   },
+
+  scroll: { flex: 1 },
+
+  scrollContent: {
+    paddingTop: 60,
+    paddingHorizontal: 20,
+    alignItems: "stretch",
+  },
+
   settingsTitle: {
     fontSize: 26,
     fontWeight: "700",
@@ -172,6 +203,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
+
   settingRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -182,11 +214,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 10,
   },
+
   settingLabel: {
     fontSize: 16,
     color: "#ffffff",
     flexShrink: 1,
+    paddingRight: 12,
   },
+
   settingsSaveBtn: {
     marginTop: 20,
     backgroundColor: "#ffdd55",
@@ -199,74 +234,64 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#333333",
   },
-premiumBox: {
-  backgroundColor: "rgba(255, 221, 85, 0.10)",
-  borderWidth: 1.5,
-  borderColor: "rgba(255, 221, 85, 0.8)",
-  borderRadius: 14,
-  padding: 16,
-  marginTop: 20,
-},
 
-premiumTitle: {
-  fontSize: 18,
-  fontWeight: "700",
-  color: "#ffdd55",
-  marginBottom: 4,
-},
+  premiumBox: {
+    backgroundColor: "rgba(255, 221, 85, 0.10)",
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 221, 85, 0.8)",
+    borderRadius: 14,
+    padding: 16,
+    marginTop: 20,
+  },
+  premiumTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#ffdd55",
+    marginBottom: 4,
+  },
+  premiumSubtitle: {
+    fontSize: 13,
+    color: "#ffffff",
+    opacity: 0.85,
+    marginBottom: 10,
+  },
+  benefitsList: { marginVertical: 6 },
+  benefitLine: {
+    color: "#ffffff",
+    fontSize: 13,
+    marginBottom: 4,
+    opacity: 0.9,
+  },
+  premiumButton: {
+    marginTop: 12,
+    backgroundColor: "#ffdd55",
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  premiumButtonText: {
+    fontWeight: "700",
+    fontSize: 15,
+    color: "#333333",
+  },
 
-premiumSubtitle: {
-  fontSize: 13,
-  color: "#ffffff",
-  opacity: 0.85,
-  marginBottom: 10,
-},
-
-benefitsList: {
-  marginVertical: 6,
-},
-
-benefitLine: {
-  color: "#ffffff",
-  fontSize: 13,
-  marginBottom: 4,
-  opacity: 0.9,
-},
-
-premiumButton: {
-  marginTop: 12,
-  backgroundColor: "#ffdd55",
-  paddingVertical: 10,
-  borderRadius: 10,
-  alignItems: "center",
-},
-
-premiumButtonText: {
-  fontWeight: "700",
-  fontSize: 15,
-  color: "#333333",
-},
-
-// --- active premium ---
-premiumActiveBox: {
-  backgroundColor: "rgba(255, 221, 85, 0.15)",
-  borderColor: "#ffdd55",
-  borderWidth: 1.5,
-  borderRadius: 14,
-  padding: 16,
-  marginTop: 20,
-},
-
-premiumActiveTitle: {
-  fontSize: 18,
-  fontWeight: "700",
-  color: "#ffdd55",
-  marginBottom: 6,
-},
-
-premiumActiveSubtitle: {
-  fontSize: 13,
-  color: "#ffffff",
-  opacity: 0.85,
-},
+  premiumActiveBox: {
+    backgroundColor: "rgba(255, 221, 85, 0.15)",
+    borderColor: "#ffdd55",
+    borderWidth: 1.5,
+    borderRadius: 14,
+    padding: 16,
+    marginTop: 20,
+  },
+  premiumActiveTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#ffdd55",
+    marginBottom: 6,
+  },
+  premiumActiveSubtitle: {
+    fontSize: 13,
+    color: "#ffffff",
+    opacity: 0.85,
+  },
 });
